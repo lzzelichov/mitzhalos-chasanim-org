@@ -3,25 +3,244 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ivory: #fdf8f0;
+  --burgundy: #7a1f3d;
+  --gold: #c9a84c;
+  --cream: #f5e6d3;
+  --charcoal: #2d2013;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  padding: 0;
+  margin: 0;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--charcoal);
+  background:
+    radial-gradient(1100px 500px at 50% -8%, rgba(201, 168, 76, 0.14), transparent 60%),
+    radial-gradient(900px 500px at 100% 100%, rgba(122, 31, 61, 0.06), transparent 60%),
+    var(--ivory);
+  background-attachment: fixed;
+  min-height: 100vh;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+/* RTL helper */
+[dir='rtl'] .flip-rtl {
+  transform: scaleX(-1);
+}
+
+/* Hebrew typography */
+html[lang='he'] body {
+  font-family: var(--font-noto-he), var(--font-lato), system-ui, sans-serif;
+}
+html[lang='he'] h1,
+html[lang='he'] h2,
+html[lang='he'] h3,
+html[lang='he'] .font-display,
+html[lang='he'] .font-serif {
+  font-family: var(--font-noto-he), Georgia, serif;
+}
+html[lang='he'] .story-content {
+  text-align: right;
+}
+
+@layer components {
+  /* Primary button: burgundy fill, gold text + border; hover inverts; shimmer sweep */
+  .btn-gold {
+    position: relative;
+    overflow: hidden;
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-gold
+           bg-burgundy px-6 py-2.5 font-sans font-semibold uppercase tracking-wide text-gold
+           transition-colors duration-300 hover:bg-gold hover:text-burgundy
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/60
+           disabled:cursor-not-allowed disabled:opacity-60;
   }
+  .btn-gold::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.4) 50%, transparent 70%);
+    transform: translateX(-130%);
+    pointer-events: none;
+  }
+  .btn-gold:hover::after {
+    animation: shimmer-sweep 0.8s ease;
+  }
+  @keyframes shimmer-sweep {
+    to {
+      transform: translateX(130%);
+    }
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-burgundy/30
+           bg-white/70 px-5 py-2.5 font-sans font-medium text-burgundy
+           transition-colors hover:bg-white hover:border-burgundy/60;
+  }
+
+  .field {
+    @apply w-full rounded-lg border border-charcoal/15 bg-white px-4 py-3 font-sans text-charcoal
+           placeholder:text-charcoal/40 focus:border-gold focus:outline-none
+           focus:ring-2 focus:ring-gold/30;
+  }
+
+  .label {
+    @apply mb-1.5 block font-sans text-sm font-semibold text-charcoal/80;
+  }
+
+  .card {
+    @apply rounded-2xl border border-gold/30 bg-white/85 p-6 shadow-sm;
+  }
+
+  /* Luxury wedding-invitation card */
+  .invite-card {
+    @apply relative rounded-lg border border-gold/50 bg-cream/70 shadow-sm;
+  }
+}
+
+/* Thin gold section divider */
+.gold-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  border: 0;
+}
+
+/* Glowing chuppa */
+.chuppa-glow {
+  filter: drop-shadow(0 0 14px rgba(201, 168, 76, 0.55));
+}
+
+/* ── Falling rose petals (subtle) ── */
+.petals {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.petal {
+  position: absolute;
+  top: -24px;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, #e8b4b8 0%, #c9a84c 100%);
+  border-radius: 150% 0 150% 0;
+  opacity: 0;
+  will-change: transform;
+  animation-name: petalFall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes petalFall {
+  0% {
+    transform: translate3d(0, -5vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate3d(24px, 45vh, 0) rotate(180deg);
+  }
+  88% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate3d(-14px, 96vh, 0) rotate(360deg);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .petal {
+    display: none;
+  }
+}
+
+/* ── Date tile flip ── */
+.tileflip {
+  perspective: 700px;
+}
+.tileflip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+}
+.tileflip:hover .tileflip-inner,
+.tileflip:focus-within .tileflip-inner {
+  transform: rotateY(180deg);
+}
+.tileflip-face {
+  position: absolute;
+  inset: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.tileflip-back {
+  transform: rotateY(180deg);
+}
+
+/* Shabbat tiles: gold shimmer border */
+.shabbat-shimmer {
+  box-shadow:
+    0 0 0 2px rgba(201, 168, 76, 0.8),
+    0 0 14px rgba(201, 168, 76, 0.45);
+  animation: pulse-soft 2.4s ease-in-out infinite;
+}
+
+/* Rich-text rendering (story + bios) */
+.story-content {
+  line-height: 1.8;
+}
+.story-content p {
+  margin: 0 0 1rem;
+}
+.story-content h1,
+.story-content h2,
+.story-content h3 {
+  font-family: var(--font-cormorant), Georgia, serif;
+  margin: 1.5rem 0 0.75rem;
+  font-weight: 700;
+}
+.story-content ul,
+.story-content ol {
+  margin: 0 0 1rem;
+  padding-inline-start: 1.5rem;
+}
+.story-content ul {
+  list-style: disc;
+}
+.story-content ol {
+  list-style: decimal;
+}
+.story-content a {
+  color: var(--burgundy);
+  text-decoration: underline;
+}
+.story-content blockquote {
+  border-inline-start: 3px solid var(--gold);
+  padding-inline-start: 1rem;
+  font-style: italic;
+  color: rgba(45, 32, 19, 0.75);
+}
+
+/* Quill editor theming */
+.ql-toolbar.ql-snow,
+.ql-container.ql-snow {
+  border-color: rgba(45, 32, 19, 0.15) !important;
+}
+.ql-toolbar.ql-snow {
+  border-radius: 0.5rem 0.5rem 0 0;
+  background: #fff;
+}
+.ql-container.ql-snow {
+  border-radius: 0 0 0.5rem 0.5rem;
+  background: #fff;
+  min-height: 140px;
+  font-family: var(--font-lato), system-ui, sans-serif;
 }
