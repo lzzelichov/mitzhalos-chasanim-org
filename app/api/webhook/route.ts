@@ -4,20 +4,18 @@ import { revalidateTag } from 'next/cache';
 import type Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe';
 import { getSupabaseAdmin, SB_TAG } from '@/lib/supabase/server';
-import { hebrewFull } from '@/lib/hebcal';
+import { donorConfirmationEmail } from '@/lib/emails/templates';
 import { sendEmail } from '@/lib/emails/send';
-import { donorConfirmationEmail, adminDonationAlertEmail } from '@/lib/emails/templates';
+import { hebrewFull } from '@/lib/hebcal';
+import { getSiteUrl } from '@/lib/utils';
 
-// Stripe needs the Node runtime + the raw request body.
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   const stripe = getStripe();
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!stripe || !secret) {
-    return NextResponse.json({ error: 'not_configured' }, { status: 503 });
-  }
+  if (!stripe || !secret) return NextResponse.json({ error: 'not_configured' }, { status: 503 });
 
   const body = await req.text();
   const sig = headers().get('stripe-signature') ?? '';
@@ -34,103 +32,53 @@ export async function POST(req: Request) {
     const sb = getSupabaseAdmin();
     if (sb) {
       const md = session.metadata ?? {};
-      const currency = 'usd';
-      const amount =
-        Number(md.amount) || (session.amount_total ? session.amount_total / 100 : 0);
-      const weddingId = md.wedding_id || null;
-      const sponsorDate = md.sponsor_date || '';
-      let dedicatedDateId = md.dedicated_date_id || null;
-
-      // For a wedding sponsorship, ensure a date tile exists, then link it.
-      if (weddingId && sponsorDate) {
-        const { data: existing } = await sb
-          .from('dates')
-          .select('id')
-          .eq('wedding_id', weddingId)
-          .eq('date', sponsorDate)
-          .maybeSingle();
-        if (existing) {
-          dedicatedDateId = existing.id;
-        } else {
-          const { data: ins } = await sb
-            .from('dates')
-            .insert({ wedding_id: weddingId, date: sponsorDate, is_published: true })
-            .select('id')
-            .single();
-          dedicatedDateId = ins?.id ?? null;
-        }
-      }
+      const amount = Number(md.amount) || (session.amount_total ? session.amount_total / 100 : 0);
+      const coupleId = md.couple_id || null;
+      const type = md.type === 'full_package' ? 'full_package' : 'partial';
+      const email = session.customer_details?.email || md.email || null;
 
       await sb.from('donations').insert({
+        couple_id: coupleId,
         donor_name: md.donor_name || 'Anonymous',
-        amount,
-        currency,
-        message: null,
         is_anonymous: md.is_anonymous === '1',
-        wedding_id: weddingId,
-        dedicated_date_id: dedicatedDateId,
+        amount,
+        type,
+        currency: 'usd',
+        status: 'paid',
+        email,
         stripe_session_id: session.id,
       });
-      revalidateTag(SB_TAG);
 
-      // Email hooks — no-op unless RESEND_API_KEY is set (see lib/emails/send.ts).
-      if (process.env.RESEND_API_KEY) {
-        try {
-          const origin = process.env.NEXT_PUBLIC_SITE_URL || '';
-          let chatanName = '';
-          let slug = '';
-          if (weddingId) {
-            const { data: w } = await sb
-              .from('weddings')
-              .select('chatan_name_en, slug')
-              .eq('id', weddingId)
-              .maybeSingle();
-            chatanName = w?.chatan_name_en ?? '';
-            slug = w?.slug ?? '';
-          }
-          const heb = sponsorDate ? hebrewFull(sponsorDate) : '';
-          const weddingUrl = slug ? `${origin}/en/wedding/${slug}` : origin;
-          const donorEmail = session.customer_details?.email ?? '';
-          if (donorEmail) {
-            await sendEmail(
-              donorEmail,
-              donorConfirmationEmail({
-                donorName: md.donor_name || 'Friend',
-                amount,
-                currency,
-                hebrewDate: heb,
-                englishDate: sponsorDate,
-                chatanName,
-                weddingUrl,
-              })
-            );
-          }
-          if (process.env.ADMIN_EMAIL) {
-            await sendEmail(
-              process.env.ADMIN_EMAIL,
-              adminDonationAlertEmail({
-                chatanName,
-                donorName: md.donor_name || 'Anonymous',
-                amount,
-                currency,
-                dateSponsored: `${heb} / ${sponsorDate}`,
-                adminUrl: `${origin}/en/admin/weddings`,
-              })
-            );
-          }
-          // Mark as emailed (column added in migration_v4; ignore if absent).
+      // Update the couple's running totals + optionally email the donor.
+      if (coupleId) {
+        const { data: c } = await sb
+          .from('couples')
+          .select('total_raised, donor_count, chatan_name_en, wedding_date')
+          .eq('id', coupleId)
+          .maybeSingle();
+        if (c) {
           await sb
-            .from('donations')
-            .update({ email_sent: true })
-            .eq('stripe_session_id', session.id)
-            .then(
-              () => {},
-              () => {}
-            );
-        } catch {
-          /* email failures must never break the webhook */
+            .from('couples')
+            .update({
+              total_raised: (Number(c.total_raised) || 0) + amount,
+              donor_count: (Number(c.donor_count) || 0) + 1,
+            })
+            .eq('id', coupleId);
+        }
+        if (process.env.RESEND_API_KEY && email) {
+          await sendEmail(
+            email,
+            donorConfirmationEmail({
+              donorName: md.donor_name || 'Friend',
+              amount,
+              coupleName: c?.chatan_name_en ? `Chatan ${c.chatan_name_en}` : 'a chatan',
+              hebrewDate: c?.wedding_date ? hebrewFull(c.wedding_date) : '',
+              siteUrl: getSiteUrl(),
+            })
+          ).catch(() => {});
         }
       }
+      revalidateTag(SB_TAG);
     }
   }
 

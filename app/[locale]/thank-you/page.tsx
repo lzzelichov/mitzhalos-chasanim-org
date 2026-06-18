@@ -1,18 +1,28 @@
 import { Suspense } from 'react';
 import { setRequestLocale } from 'next-intl/server';
-import HeroBackground from '@/components/HeroBackground';
+import { getSiteContent, contentRaw } from '@/lib/siteContent';
+import { getSiteUrl } from '@/lib/utils';
 import ThankYouClient from '@/components/ThankYouClient';
 
-// Reads query params at runtime — render dynamically (no static prerender).
 export const dynamic = 'force-dynamic';
 
-export default function ThankYouPage({ params: { locale } }: { params: { locale: string } }) {
+export default async function ThankYouPage({ params: { locale } }: { params: { locale: string } }) {
   setRequestLocale(locale);
+  const c = await getSiteContent();
+  const r = (k: string, f = '') => contentRaw(c, k, locale, f);
+
   return (
-    <HeroBackground image="thankyou" className="px-2 py-10">
-      <Suspense fallback={null}>
-        <ThankYouClient />
-      </Suspense>
-    </HeroBackground>
+    <Suspense>
+      <ThankYouClient
+        locale={locale}
+        siteUrl={getSiteUrl() || ''}
+        labels={{
+          title: r('thankyou.title', 'Thank you!'),
+          subtitle: r('thankyou.subtitle', ''),
+          share: r('thankyou.share', 'Share'),
+          back: r('thankyou.back', 'Back to Home'),
+        }}
+      />
+    </Suspense>
   );
 }

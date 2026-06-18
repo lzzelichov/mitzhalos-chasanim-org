@@ -1,21 +1,14 @@
 import { setRequestLocale } from 'next-intl/server';
-import { supabaseConfigured, supabaseAdminConfigured } from '@/lib/supabase/server';
-import { SECTIONS } from '@/lib/siteContent';
-import AdminContentLazy from '@/components/AdminContentLazy';
+import AdminGate from '@/components/admin/AdminGate';
+import AdminContentEditor from '@/components/admin/AdminContentEditor';
 
 export const dynamic = 'force-dynamic';
 
-export default function AdminContentPage({
-  params: { locale },
-}: {
-  params: { locale: string };
-}) {
+export default function Page({ params: { locale } }: { params: { locale: string } }) {
   setRequestLocale(locale);
   return (
-    <AdminContentLazy
-      sections={SECTIONS}
-      supabaseReady={supabaseConfigured}
-      adminReady={supabaseAdminConfigured && Boolean(process.env.ADMIN_PASSWORD)}
-    />
+    <AdminGate title="Content CMS">
+      <AdminContentEditor mode="content" />
+    </AdminGate>
   );
 }

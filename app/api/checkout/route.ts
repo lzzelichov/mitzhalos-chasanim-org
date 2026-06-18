@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe';
-import { getSupabaseAnon } from '@/lib/supabase/server';
+import { getCoupleById } from '@/lib/data';
 import { getSiteUrl } from '@/lib/utils';
 
 // Basic in-memory rate limit (per server instance): 10 requests / minute / IP.
@@ -20,7 +20,7 @@ function rateLimited(ip: string): boolean {
 function sanitizeName(input: unknown): string {
   return (input ?? '')
     .toString()
-    .replace(/<[^>]*>/g, '') // strip HTML tags
+    .replace(/<[^>]*>/g, '')
     .replace(/[\r\n]+/g, ' ')
     .trim()
     .slice(0, 100);
@@ -28,61 +28,31 @@ function sanitizeName(input: unknown): string {
 
 export async function POST(req: Request) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  if (rateLimited(ip)) {
-    return NextResponse.json({ error: 'rate_limited' }, { status: 429 });
-  }
+  if (rateLimited(ip)) return NextResponse.json({ error: 'rate_limited' }, { status: 429 });
 
   const stripe = getStripe();
-  if (!stripe) {
-    return NextResponse.json({ error: 'stripe_not_configured' }, { status: 503 });
-  }
+  if (!stripe) return NextResponse.json({ error: 'stripe_not_configured' }, { status: 503 });
 
   const body = await req.json().catch(() => ({}));
   const amount = Math.floor(Number(body.amount));
-  const currency = 'usd';
+  const type = body.type === 'full_package' ? 'full_package' : 'partial';
   const donorName = sanitizeName(body.donorName);
-  const email = (body.donorEmail ?? '').toString().trim().slice(0, 200);
+  const email = (body.email ?? body.donorEmail ?? '').toString().trim().slice(0, 200);
   const isAnonymous = Boolean(body.isAnonymous);
   const locale = body.locale === 'he' ? 'he' : 'en';
-  const weddingId = body.weddingId ? String(body.weddingId) : '';
-  const weddingSlug = body.weddingSlug ? String(body.weddingSlug) : '';
-  const sponsorDate = body.sponsorDate ? String(body.sponsorDate) : '';
-  const dedicatedDateId = body.dedicatedDateId ? String(body.dedicatedDateId) : '';
+  const coupleId = body.coupleId ? String(body.coupleId) : '';
 
-  if (!amount || amount < 1) {
-    return NextResponse.json({ error: 'invalid_amount' }, { status: 400 });
+  if (!amount || amount < 18) return NextResponse.json({ error: 'invalid_amount' }, { status: 400 });
+
+  let chatan = '';
+  if (coupleId) {
+    const c = await getCoupleById(coupleId);
+    if (c) chatan = locale === 'he' ? c.chatan_name_he || c.chatan_name_en : c.chatan_name_en;
   }
 
   const origin = getSiteUrl(new URL(req.url).origin);
-  const sb = getSupabaseAnon();
-
-  let chatan = '';
-  let slugForUrl = weddingSlug;
-  let dateForUrl = sponsorDate;
-
-  if (weddingId && sb) {
-    const { data } = await sb
-      .from('weddings')
-      .select('slug, chatan_name_en, chatan_name_he')
-      .eq('id', weddingId)
-      .maybeSingle();
-    if (data) {
-      chatan = locale === 'he' ? data.chatan_name_he || data.chatan_name_en : data.chatan_name_en;
-      slugForUrl = data.slug;
-    }
-  } else if (dedicatedDateId && sb) {
-    const { data } = await sb.from('dates').select('date').eq('id', dedicatedDateId).maybeSingle();
-    dateForUrl = data?.date ?? '';
-  }
-
-  const successParams = new URLSearchParams({ name: donorName, amount: String(amount), currency });
-  if (dateForUrl) successParams.set('date', dateForUrl);
-  if (chatan) successParams.set('chatan', chatan);
-  if (slugForUrl) successParams.set('wedding', slugForUrl);
-
-  const cancelUrl = weddingSlug
-    ? `${origin}/${locale}/wedding/${weddingSlug}`
-    : `${origin}/${locale}/donate`;
+  const params = new URLSearchParams({ name: donorName, amount: String(amount) });
+  if (chatan) params.set('chatan', chatan);
 
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
@@ -91,24 +61,24 @@ export async function POST(req: Request) {
       {
         quantity: 1,
         price_data: {
-          currency,
+          currency: 'usd',
           unit_amount: amount * 100,
           product_data: {
-            name: chatan ? `Wedding Sponsorship — Chatan ${chatan}` : 'Wedding Fund Donation',
+            name: chatan ? `Wedding Clothing — Chatan ${chatan}` : 'Mitzhalos Chasanim Donation',
           },
         },
       },
     ],
-    success_url: `${origin}/${locale}/thank-you?${successParams.toString()}&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: cancelUrl,
+    success_url: `${origin}/${locale}/thank-you?${params.toString()}&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${origin}/${locale}/sponsor`,
     metadata: {
+      couple_id: coupleId,
       donor_name: donorName,
       amount: String(amount),
-      currency,
+      type,
       is_anonymous: isAnonymous ? '1' : '0',
-      wedding_id: weddingId,
-      sponsor_date: sponsorDate,
-      dedicated_date_id: dedicatedDateId,
+      chatan,
+      email,
     },
   });
 

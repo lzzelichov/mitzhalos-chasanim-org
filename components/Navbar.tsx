@@ -1,116 +1,117 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { Link, usePathname } from '@/i18n/routing';
-import { cn } from '@/lib/utils';
+import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { hasAdminUiCookie } from '@/lib/adminClient';
-import { useSetting } from './SiteContentProvider';
-import LanguageToggle from './LanguageToggle';
+import { cn } from '@/lib/utils';
 
-export default function Navbar({ coupleName }: { coupleName?: string }) {
-  const t = useTranslations('Nav');
-  const tc = useTranslations('Common');
+interface NavLabels {
+  home: string;
+  about: string;
+  sponsor: string;
+  news: string;
+  contact: string;
+}
+
+export default function Navbar({
+  locale,
+  siteName,
+  nav,
+}: {
+  locale: string;
+  siteName: string;
+  nav: NavLabels;
+}) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [admin, setAdmin] = useState(false);
 
-  const [showAdmin, setShowAdmin] = useState(process.env.NODE_ENV === 'development');
-  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
-    if (hasAdminUiCookie()) setShowAdmin(true);
+    setAdmin(hasAdminUiCookie());
   }, []);
-  // Close the mobile menu whenever the route changes.
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
 
-  const showSearch = useSetting('show_search');
-  const showLang = useSetting('show_language_toggle');
-
-  const title = coupleName?.trim() ? coupleName : tc('siteName');
   const links = [
-    { href: '/', label: t('home') },
-    { href: '/weddings', label: t('weddings') },
-    ...(showSearch ? [{ href: '/search', label: t('search') }] : []),
-    ...(showAdmin ? [{ href: '/admin', label: t('admin') }] : []),
+    { href: '/', label: nav.home },
+    { href: '/about', label: nav.about },
+    { href: '/sponsor', label: nav.sponsor },
+    { href: '/news', label: nav.news },
+    { href: '/contact', label: nav.contact },
   ];
+  const other = locale === 'he' ? 'en' : 'he';
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gold/20 bg-burgundy/95 backdrop-blur supports-[backdrop-filter]:bg-burgundy/85">
-      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
-        <Link
-          href="/"
-          className="flex items-center gap-2 font-display text-xl font-bold text-white sm:text-2xl"
-        >
-          <span aria-hidden className="text-gold">💍</span>
-          <span className="line-clamp-1">{title}</span>
+    <header className="sticky top-0 z-50 border-b border-gold/30 bg-ivory/90 backdrop-blur">
+      <nav className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+        <Link href="/" className="font-display text-lg font-bold leading-tight text-burgundy sm:text-xl">
+          {siteName}
         </Link>
 
-        <div className="flex items-center gap-2 sm:gap-4">
-          {/* Desktop links */}
-          <div className="hidden items-center gap-4 sm:flex">
-            {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className={cn(
-                  'font-sans text-sm font-medium transition-colors',
-                  pathname === l.href ? 'text-gold' : 'text-white/80 hover:text-white'
-                )}
-              >
-                {l.label}
-              </Link>
-            ))}
-          </div>
-
-          {showLang && (
-            <span className="hidden sm:inline-flex">
-              <LanguageToggle />
-            </span>
-          )}
-
-          <Link href="/donate" className="btn-gold !px-4 !py-2 text-sm">
-            {t('donate')}
-          </Link>
-
-          {/* Mobile hamburger */}
-          <button
-            type="button"
-            aria-label="Menu"
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((o) => !o)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-2xl text-white sm:hidden"
-          >
-            {menuOpen ? '✕' : '☰'}
-          </button>
-        </div>
-      </nav>
-
-      {/* Mobile full-screen overlay */}
-      {menuOpen && (
-        <div className="fixed inset-0 top-16 z-50 flex flex-col gap-1 bg-burgundy/98 p-6 backdrop-blur sm:hidden">
+        <div className="hidden items-center gap-1 md:flex">
           {links.map((l) => (
             <Link
               key={l.href}
               href={l.href}
-              onClick={() => setMenuOpen(false)}
               className={cn(
-                'rounded-lg px-4 py-3 font-display text-2xl transition-colors',
-                pathname === l.href ? 'text-gold' : 'text-white/90 hover:bg-white/10'
+                'rounded-full px-3 py-1.5 font-sans text-sm font-medium transition-colors',
+                pathname === l.href ? 'bg-burgundy text-gold' : 'text-charcoal hover:text-burgundy'
               )}
             >
               {l.label}
             </Link>
           ))}
-          <div className="mt-4 flex items-center gap-3">
-            {showLang && <LanguageToggle />}
-            <Link
-              href="/donate"
-              onClick={() => setMenuOpen(false)}
-              className="btn-gold flex-1 justify-center"
-            >
-              {t('donate')}
+          {admin && (
+            <Link href="/admin" className="rounded-full px-3 py-1.5 font-sans text-sm text-charcoal/50 hover:text-burgundy">
+              Admin
             </Link>
-          </div>
+          )}
+          <button
+            onClick={() => router.replace(pathname, { locale: other })}
+            className="ml-1 rounded-full border border-burgundy/30 px-3 py-1.5 font-sans text-sm font-semibold text-burgundy hover:bg-burgundy hover:text-gold"
+          >
+            {other === 'he' ? 'עברית' : 'EN'}
+          </button>
+        </div>
+
+        <button
+          onClick={() => setOpen((o) => !o)}
+          className="rounded-lg border border-burgundy/30 px-3 py-1.5 text-burgundy md:hidden"
+          aria-label="Menu"
+          aria-expanded={open}
+        >
+          {open ? '✕' : '☰'}
+        </button>
+      </nav>
+
+      {open && (
+        <div className="border-t border-gold/20 bg-ivory px-4 py-2 md:hidden">
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={() => setOpen(false)}
+              className={cn(
+                'block rounded-lg px-3 py-2 font-sans text-sm font-medium',
+                pathname === l.href ? 'bg-burgundy text-gold' : 'text-charcoal hover:bg-cream'
+              )}
+            >
+              {l.label}
+            </Link>
+          ))}
+          {admin && (
+            <Link href="/admin" onClick={() => setOpen(false)} className="block rounded-lg px-3 py-2 font-sans text-sm text-charcoal/60">
+              Admin
+            </Link>
+          )}
+          <button
+            onClick={() => {
+              setOpen(false);
+              router.replace(pathname, { locale: other });
+            }}
+            className="mt-1 block w-full rounded-lg px-3 py-2 text-start font-sans text-sm font-semibold text-burgundy"
+          >
+            {other === 'he' ? 'עברית' : 'English'}
+          </button>
         </div>
       )}
     </header>

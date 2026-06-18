@@ -1,9 +1,14 @@
 import { setRequestLocale } from 'next-intl/server';
-import AdminDashboard from '@/components/AdminDashboard';
+import AdminGate from '@/components/admin/AdminGate';
+import AdminDashboard from '@/components/admin/AdminDashboard';
 
 export const dynamic = 'force-dynamic';
 
 export default function AdminPage({ params: { locale } }: { params: { locale: string } }) {
   setRequestLocale(locale);
-  return <AdminDashboard />;
+  return (
+    <AdminGate title="Admin">
+      <AdminDashboard />
+    </AdminGate>
+  );
 }
