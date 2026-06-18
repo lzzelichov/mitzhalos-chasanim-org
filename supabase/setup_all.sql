@@ -78,7 +78,7 @@ create policy "public read date photos" on storage.objects
 -- ---------- Seed a single site_config row ----------
 
 insert into public.site_config (goal_amount, couple_name, start_date, end_date)
-select 10000, 'Alex & Sam', date '2025-06-01', date '2025-06-30'
+select 10000, 'מצהלות חתנים / Mitzhalos Chasanim', date '2025-06-01', date '2025-06-30'
 where not exists (select 1 from public.site_config);
 
 -- ======================== MIGRATION V2 ====================

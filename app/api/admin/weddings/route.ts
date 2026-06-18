@@ -6,6 +6,11 @@ import { hebrewFull } from '@/lib/hebcal';
 
 const BUCKET = 'wedding-covers';
 
+/** Safe message from an unknown thrown value (TS: catch vars are `unknown`). */
+function errMsg(e: unknown): string {
+  return e instanceof Error ? e.message : String(e);
+}
+
 function guard() {
   if (!isAdminAuthed()) {
     return { error: NextResponse.json({ error: 'unauthorized' }, { status: 401 }) };
@@ -54,66 +59,78 @@ export async function POST(req: Request) {
   const { sb, error } = guard();
   if (error) return error;
 
-  const fd = await req.formData();
-  const id = (fd.get('id') as string) || '';
-  const chatan_name_en = (fd.get('chatan_name_en') as string) || '';
-  const wedding_date = (fd.get('wedding_date') as string) || '';
-  if (!chatan_name_en || !wedding_date) {
-    return NextResponse.json({ error: 'missing_required' }, { status: 400 });
+  try {
+    const fd = await req.formData();
+    const id = (fd.get('id') as string) || '';
+    const chatan_name_en = (fd.get('chatan_name_en') as string) || '';
+    const wedding_date = (fd.get('wedding_date') as string) || '';
+    if (!chatan_name_en || !wedding_date) {
+      return NextResponse.json({ error: 'Missing required field: chatan name and wedding date.' }, { status: 400 });
+    }
+
+    let slug = slugify((fd.get('slug') as string) || '');
+    if (!slug) slug = slugify(`${chatan_name_en}-${wedding_date}`);
+
+    const str = (k: string) => (fd.get(k) as string) || null;
+
+    const payload: Record<string, unknown> = {
+      slug,
+      chatan_name_en,
+      chatan_name_he: str('chatan_name_he'),
+      kallah_initial: str('kallah_initial'),
+      wedding_date,
+      hebrew_date_str: hebrewFull(wedding_date),
+      venue: str('venue'),
+      city: (fd.get('city') as string) || 'Jerusalem',
+      story: str('story'),
+      goal_usd: Number(fd.get('goal_usd')) || 0,
+      status: (fd.get('status') as string) || 'active',
+      // Extended profile fields
+      chatan_father_name: str('chatan_father_name'),
+      chatan_mother_name: str('chatan_mother_name'),
+      chatan_born: str('chatan_born'),
+      chatan_learns_works: str('chatan_learns_works'),
+      chatan_link: str('chatan_link'),
+      chatan_bio: str('chatan_bio'),
+      kallah_father_name: str('kallah_father_name'),
+      kallah_mother_name: str('kallah_mother_name'),
+      kallah_born: str('kallah_born'),
+      kallah_learns_works: str('kallah_learns_works'),
+      kallah_link: str('kallah_link'),
+      kallah_bio: str('kallah_bio'),
+    };
+
+    // SITE POLICY: No images of women. Jerusalem / venue landscapes only.
+    // No cover uploaded → save proceeds with cover_photo_url left untouched (null on create).
+    const cover = fd.get('cover') as File | null;
+    if (cover && cover.size > 0) {
+      const ext = (cover.name.split('.').pop() || 'jpg').toLowerCase();
+      const path = `${slug}-${Date.now()}.${ext}`;
+      const buf = Buffer.from(await cover.arrayBuffer());
+      const { error: upErr } = await sb!.storage
+        .from(BUCKET)
+        .upload(path, buf, { contentType: cover.type || 'image/jpeg', upsert: true });
+      if (upErr) {
+        console.error('Save error (cover upload):', upErr);
+        return NextResponse.json({ error: `Cover upload failed: ${upErr.message}` }, { status: 500 });
+      }
+      payload.cover_photo_url = sb!.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+    }
+
+    const { data, error: dbErr } = id
+      ? await sb!.from('weddings').update(payload).eq('id', id).select()
+      : await sb!.from('weddings').upsert(payload, { onConflict: 'slug' }).select();
+    console.log('Supabase response:', data, dbErr);
+    if (dbErr) {
+      console.error('Save error (db):', dbErr);
+      return NextResponse.json({ error: dbErr.message }, { status: 500 });
+    }
+    revalidateTag(SB_TAG);
+    return NextResponse.json({ ok: true, slug });
+  } catch (e) {
+    console.error('Save error:', e);
+    return NextResponse.json({ error: errMsg(e) }, { status: 500 });
   }
-
-  let slug = slugify((fd.get('slug') as string) || '');
-  if (!slug) slug = slugify(`${chatan_name_en}-${wedding_date}`);
-
-  const str = (k: string) => (fd.get(k) as string) || null;
-
-  const payload: Record<string, unknown> = {
-    slug,
-    chatan_name_en,
-    chatan_name_he: str('chatan_name_he'),
-    kallah_initial: str('kallah_initial'),
-    wedding_date,
-    hebrew_date_str: hebrewFull(wedding_date),
-    venue: str('venue'),
-    city: (fd.get('city') as string) || 'Jerusalem',
-    story: str('story'),
-    goal_usd: Number(fd.get('goal_usd')) || 0,
-    status: (fd.get('status') as string) || 'active',
-    // Extended profile fields
-    chatan_father_name: str('chatan_father_name'),
-    chatan_mother_name: str('chatan_mother_name'),
-    chatan_born: str('chatan_born'),
-    chatan_learns_works: str('chatan_learns_works'),
-    chatan_link: str('chatan_link'),
-    chatan_bio: str('chatan_bio'),
-    kallah_father_name: str('kallah_father_name'),
-    kallah_mother_name: str('kallah_mother_name'),
-    kallah_born: str('kallah_born'),
-    kallah_learns_works: str('kallah_learns_works'),
-    kallah_link: str('kallah_link'),
-    kallah_bio: str('kallah_bio'),
-  };
-
-  // SITE POLICY: No images of women. Jerusalem / venue landscapes only.
-  const cover = fd.get('cover') as File | null;
-  if (cover && cover.size > 0) {
-    const ext = (cover.name.split('.').pop() || 'jpg').toLowerCase();
-    const path = `${slug}-${Date.now()}.${ext}`;
-    const buf = Buffer.from(await cover.arrayBuffer());
-    const { error: upErr } = await sb!.storage
-      .from(BUCKET)
-      .upload(path, buf, { contentType: cover.type || 'image/jpeg', upsert: true });
-    if (upErr) return NextResponse.json({ error: upErr.message }, { status: 500 });
-    payload.cover_photo_url = sb!.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
-  }
-
-  const dbErr = id
-    ? (await sb!.from('weddings').update(payload).eq('id', id)).error
-    : (await sb!.from('weddings').upsert(payload, { onConflict: 'slug' })).error;
-
-  if (dbErr) return NextResponse.json({ error: dbErr.message }, { status: 500 });
-  revalidateTag(SB_TAG);
-  return NextResponse.json({ ok: true, slug });
 }
 
 export async function DELETE(req: Request) {

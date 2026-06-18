@@ -75,6 +75,7 @@ export default function AdminWeddingsClient({
 
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [rows, setRows] = useState<WeddingRow[]>([]);
   const visRef = useRef<Record<string, boolean>>({});
 
@@ -126,16 +127,35 @@ export default function AdminWeddingsClient({
   async function save(e: React.FormEvent) {
     e.preventDefault();
     const v = values.current;
-    if (!v.chatan_name_en || !v.wedding_date) return;
+    setSaveError(null);
+    if (!v.chatan_name_en || !v.wedding_date) {
+      setSaveError(locale === 'he' ? 'נא למלא שם חתן ותאריך חתונה.' : 'Please fill in the chatan name and wedding date.');
+      return;
+    }
     setSaving(true);
     setSaved(false);
+    console.log('Save triggered, data:', v);
     const fd = new FormData();
     Object.keys(EMPTY).forEach((k) => fd.set(k, v[k] ?? ''));
     if (coverRef.current) fd.set('cover', coverRef.current);
 
-    const res = await fetch('/api/admin/weddings', { method: 'POST', body: fd });
-    setSaving(false);
-    if (res.ok) {
+    try {
+      const res = await fetch('/api/admin/weddings', { method: 'POST', body: fd });
+      const body = await res.json().catch(() => ({} as { error?: string }));
+      console.log('Supabase response:', res.status, body);
+
+      if (!res.ok) {
+        // Never fail silently — surface the real reason.
+        if (res.status === 401) {
+          setAuthed(false);
+          setSaveError(locale === 'he' ? 'פג תוקף ההתחברות. התחברו מחדש.' : 'Session expired — please log in again.');
+        } else {
+          const msg = body?.error || `HTTP ${res.status}`;
+          setSaveError((locale === 'he' ? 'השמירה נכשלה: ' : 'Save failed: ') + msg);
+        }
+        return;
+      }
+
       // Persist per-wedding visibility toggles (edit mode only — needs an id).
       if (v.id) {
         const visAll: Record<string, boolean> = {};
@@ -147,9 +167,14 @@ export default function AdminWeddingsClient({
         });
       }
       setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      setTimeout(() => setSaved(false), 3000);
       reset();
       void loadRows();
+    } catch (err) {
+      console.error('Save error:', err);
+      setSaveError((locale === 'he' ? 'שגיאת רשת: ' : 'Network error: ') + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -323,8 +348,27 @@ export default function AdminWeddingsClient({
         )}
 
         <button type="submit" disabled={saving} className="btn-gold w-full">
-          {saving ? t('saving') : saved ? t('saved') : t('save')}
+          {saving ? (
+            <span className="inline-flex items-center justify-center gap-2">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-burgundy/30 border-t-burgundy" aria-hidden />
+              {t('saving')}
+            </span>
+          ) : (
+            t('save')
+          )}
         </button>
+
+        {/* Never fail silently — always show the outcome. */}
+        {saveError && (
+          <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 font-sans text-sm font-medium text-red-700">
+            ⚠️ {saveError}
+          </p>
+        )}
+        {saved && !saveError && (
+          <p role="status" className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-center font-sans text-sm font-semibold text-green-700">
+            ✓ {t('saved')}
+          </p>
+        )}
       </form>
 
       <section className="mt-10">
