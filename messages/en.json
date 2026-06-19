@@ -2,5 +2,9 @@
   "Common": {
     "siteName": "Mitzhalos Chasanim",
     "loading": "Loading…"
+  },
+  "nav": {
+    "language_toggle_to_yiddish": "אידיש",
+    "language_toggle_to_english": "ענגליש"
   }
 }

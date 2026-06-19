@@ -2,5 +2,9 @@
   "Common": {
     "siteName": "מצהלות חתנים",
     "loading": "טוען…"
+  },
+  "nav": {
+    "language_toggle_to_yiddish": "אידיש",
+    "language_toggle_to_english": "ענגליש"
   }
 }
