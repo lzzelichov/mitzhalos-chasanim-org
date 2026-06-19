@@ -1,3 +1,5 @@
+import { Link } from '@/i18n/routing';
+
 interface FooterContent {
   tagline: string;
   rights: string;
@@ -19,6 +21,9 @@ export default function Footer({
         <p className="mt-4 font-sans text-xs text-cream/50">
           © {year} {siteName} · {footer.rights}
         </p>
+        <Link href="/admin" className="mt-3 inline-block font-sans text-[10px] text-cream/25 transition-colors hover:text-gold/70">
+          Admin / ניהול
+        </Link>
       </div>
     </footer>
   );

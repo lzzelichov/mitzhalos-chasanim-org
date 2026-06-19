@@ -8,6 +8,7 @@ import { getSiteContent, contentRaw, extractSettings } from '@/lib/siteContent';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MobileDonateCta from '@/components/MobileDonateCta';
+import AdminShortcut from '@/components/AdminShortcut';
 import { SiteContentProvider } from '@/components/SiteContentProvider';
 import '../globals.css';
 
@@ -70,6 +71,7 @@ export default async function LocaleLayout({
       <body className="font-sans antialiased fabric-bg-light">
         <NextIntlClientProvider messages={messages}>
           <SiteContentProvider settings={settings}>
+            <AdminShortcut />
             <Navbar locale={locale} siteName={siteName} nav={nav} />
             <main className="min-h-[55vh]">{children}</main>
             <Footer siteName={siteName} footer={footer} />
