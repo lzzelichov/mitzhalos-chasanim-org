@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { setRequestLocale } from 'next-intl/server';
 import { getSiteContent, contentRaw, contentText, settingOn } from '@/lib/siteContent';
@@ -33,6 +34,7 @@ export default async function HomePage({ params: { locale } }: { params: { local
       )}
 
       <section className="hero-section flex min-h-[70vh] items-center justify-center overflow-hidden text-center">
+        <Image src="/heroes/home.jpg" alt="" fill priority sizes="100vw" className="object-cover" />
         <div className="relative z-10 mx-auto max-w-3xl px-4 py-20">
           <h1 className="font-display">
             {r('brand.name', locale === 'he' ? 'מצהלות חתנים' : 'Mitzhalos Chasanim')}

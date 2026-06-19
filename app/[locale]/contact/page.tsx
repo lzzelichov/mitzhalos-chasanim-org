@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { setRequestLocale } from 'next-intl/server';
 import { getSiteContent, contentRaw, settingOn } from '@/lib/siteContent';
 import { waChat } from '@/lib/whatsapp';
@@ -19,6 +20,7 @@ export default async function ContactPage({ params: { locale } }: { params: { lo
   return (
     <div>
       <section className="hero-section flex min-h-[40vh] items-center justify-center overflow-hidden text-center">
+        <Image src="/heroes/contact.jpg" alt="" fill priority sizes="100vw" className="object-cover" />
         <h1 className="relative z-10 font-display">{r('contact.title', 'Contact Us')}</h1>
       </section>
 

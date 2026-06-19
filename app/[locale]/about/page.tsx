@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { setRequestLocale } from 'next-intl/server';
 import { getSiteContent, contentRaw, contentText } from '@/lib/siteContent';
@@ -23,6 +24,7 @@ export default async function AboutPage({ params: { locale } }: { params: { loca
   return (
     <div>
       <section className="hero-section flex min-h-[40vh] items-center justify-center overflow-hidden text-center">
+        <Image src="/heroes/about.jpg" alt="" fill priority sizes="100vw" className="object-cover" />
         <h1 className="relative z-10 font-display">{r('about.title', 'About Us')}</h1>
       </section>
 
