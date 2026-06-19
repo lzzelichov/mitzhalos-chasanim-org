@@ -1,7 +1,6 @@
 'use client';
 
-import { formatDateLabel } from '@/lib/utils';
-import { hebrewFull } from '@/lib/hebcal';
+import { localeDate } from '@/lib/hebcal';
 import { formatCurrency } from '@/lib/currency';
 import ProgressBar from './ProgressBar';
 import type { Couple } from '@/lib/types';
@@ -36,11 +35,9 @@ export default function CoupleCard({
         <h3 className="font-display text-2xl font-bold text-burgundy">
           {he ? 'חתן ' : 'Chatan '}
           {name}
-          {alt ? <span className="text-charcoal/50"> · {alt}</span> : null}
+          {alt && alt !== name ? <span className="text-charcoal/50"> ({alt})</span> : null}
         </h3>
-        <p className="font-sans text-sm text-charcoal/60">
-          {hebrewFull(couple.wedding_date)} · {formatDateLabel(couple.wedding_date, locale)}
-        </p>
+        <p className="font-sans text-sm text-charcoal/60">{localeDate(couple.wedding_date, locale)}</p>
       </div>
 
       <div className="grid gap-1 font-sans text-sm text-charcoal/80">

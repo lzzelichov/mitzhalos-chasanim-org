@@ -69,7 +69,7 @@ export default function Navbar({
             onClick={() => router.replace(pathname, { locale: other })}
             className="ml-1 rounded-full border border-burgundy/30 px-3 py-1.5 font-sans text-sm font-semibold text-burgundy hover:bg-burgundy hover:text-gold"
           >
-            {other === 'he' ? 'עברית' : 'EN'}
+            {locale === 'he' ? 'אנגלית' : 'Hebrew'}
           </button>
         </div>
 
@@ -110,7 +110,7 @@ export default function Navbar({
             }}
             className="mt-1 block w-full rounded-lg px-3 py-2 text-start font-sans text-sm font-semibold text-burgundy"
           >
-            {other === 'he' ? 'עברית' : 'English'}
+            {locale === 'he' ? 'אנגלית' : 'Hebrew'}
           </button>
         </div>
       )}

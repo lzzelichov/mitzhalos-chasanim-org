@@ -59,8 +59,7 @@ const SETTING = (key: string, label: string, value: string, type: ContentType = 
 /** Code defaults = source of truth + fallback when the DB is empty/unavailable. */
 export const DEFAULT_CONTENT: SiteContentRow[] = [
   // ── Homepage ──
-  T('home.tagline_en', 'homepage', 'Hero Tagline (EN)', 'Clothing a Groom is a Mitzvah', 'Clothing a Groom is a Mitzvah'),
-  T('home.tagline_he', 'homepage', 'Hero Tagline (HE)', 'לבוש חתן הוא מצווה', 'לבוש חתן הוא מצווה'),
+  T('home.tagline', 'homepage', 'Hero Tagline', 'Clothing a Groom is a Mitzvah', 'לבוש חתן הוא מצווה'),
   T('home.hero_sub', 'homepage', 'Hero Subtitle', 'Full wedding clothing packages for poor chassidish couples.', 'חבילות לבוש מלאות לזוגות חסידיים נזקקים.', 'textarea'),
   T('home.cta', 'homepage', 'Hero CTA Button', 'Sponsor a Couple', 'תמכו בחתן'),
   T('home.stat_couples', 'homepage', 'Stat label: couples', 'couples helped', 'חתנים שנעזרו'),
@@ -119,6 +118,7 @@ export const DEFAULT_CONTENT: SiteContentRow[] = [
   T('contact.success', 'contact', 'Form: Success', 'Thank you — we will be in touch.', 'תודה — ניצור קשר בהקדם.'),
 
   // ── Navigation ──
+  T('brand.name', 'navigation', 'Site Name / Brand', 'Mitzhalos Chasanim', 'מצהלות חתנים'),
   T('nav.home', 'navigation', 'Nav: Home', 'Home', 'בית'),
   T('nav.about', 'navigation', 'Nav: About', 'About', 'אודות'),
   T('nav.sponsor', 'navigation', 'Nav: Sponsor', 'Sponsor', 'תרומה'),
@@ -126,8 +126,7 @@ export const DEFAULT_CONTENT: SiteContentRow[] = [
   T('nav.contact', 'navigation', 'Nav: Contact', 'Contact', 'צרו קשר'),
 
   // ── Footer ──
-  T('footer.tagline_he', 'footer', 'Footer Tagline (HE)', 'לבוש חתן הוא מצווה', 'לבוש חתן הוא מצווה'),
-  T('footer.tagline_en', 'footer', 'Footer Tagline (EN)', 'Clothing a Groom is a Mitzvah', 'Clothing a Groom is a Mitzvah'),
+  T('footer.tagline', 'footer', 'Footer Tagline', 'Clothing a Groom is a Mitzvah', 'לבוש חתן הוא מצווה'),
   T('footer.rights', 'footer', 'Rights Notice', 'All rights reserved', 'כל הזכויות שמורות'),
 
   // ── Donate flow ──
@@ -165,7 +164,6 @@ export const DEFAULT_CONTENT: SiteContentRow[] = [
   TOGGLE('opt_corporate', 'Hidden option: corporate / group sponsorship', false),
 
   // ── Settings: config values (/admin/settings) ──
-  SETTING('settings.site_name', 'Site name', 'מצהלות חתנים / Mitzhalos Chasanim'),
   SETTING('settings.default_price', 'Default package price (USD)', '750', 'number'),
   SETTING('settings.org_email', 'Organization email', 'info@mitzhaloschasanim.org', 'email'),
   SETTING('settings.whatsapp_number', 'WhatsApp number (digits)', '17180000000', 'phone'),
@@ -173,6 +171,14 @@ export const DEFAULT_CONTENT: SiteContentRow[] = [
 
 const DEFAULT_MAP: Record<string, SiteContentRow> = Object.fromEntries(
   DEFAULT_CONTENT.map((r) => [r.key, r])
+);
+
+/**
+ * Flat {key: {en, he}} view of every default — the single source of truth that
+ * makes the site render correctly even when the site_content table is empty.
+ */
+export const CONTENT_DEFAULTS: Record<string, { en: string; he: string }> = Object.fromEntries(
+  DEFAULT_CONTENT.map((r) => [r.key, { en: r.value_en, he: r.value_he }])
 );
 
 export type ContentMap = Record<string, SiteContentRow>;
@@ -191,19 +197,23 @@ export async function getSiteContent(): Promise<ContentMap> {
   return map;
 }
 
-/** Localized string with fallback; returns '' when the row is hidden. */
+const pickLocale = (row: SiteContentRow | undefined, locale: string): string =>
+  (locale === 'he' ? row?.value_he : row?.value_en) || '';
+
+/**
+ * Localized string; returns '' when the row is hidden. Empty DB values fall
+ * back to the locale's hardcoded DEFAULT (never to the other language), so the
+ * page stays single-language even if a cell is blank.
+ */
 export function contentText(map: ContentMap, key: string, locale: string, fallback = ''): string {
   const r = map[key];
-  if (!r) return fallback;
-  if (r.is_visible === false) return '';
-  return (locale === 'he' ? r.value_he : r.value_en) || fallback;
+  if (r && r.is_visible === false) return '';
+  return pickLocale(r, locale) || pickLocale(DEFAULT_MAP[key], locale) || fallback;
 }
 
 /** Localized string ignoring the visibility flag (for nav/labels that always render). */
 export function contentRaw(map: ContentMap, key: string, locale: string, fallback = ''): string {
-  const r = map[key];
-  if (!r) return fallback;
-  return (locale === 'he' ? r.value_he : r.value_en) || fallback;
+  return pickLocale(map[key], locale) || pickLocale(DEFAULT_MAP[key], locale) || fallback;
 }
 
 /** Boolean setting (type 'toggle'); value_en holds 'true' | 'false'. */

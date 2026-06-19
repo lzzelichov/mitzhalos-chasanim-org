@@ -4,7 +4,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { getSiteContent, contentRaw, contentText, settingOn } from '@/lib/siteContent';
 import { getOrgStats, getPublishedNews } from '@/lib/data';
 import { formatCurrency } from '@/lib/currency';
-import { formatDateLabel } from '@/lib/utils';
+import { localeDate } from '@/lib/hebcal';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,10 +25,11 @@ export default async function HomePage({ params: { locale } }: { params: { local
         <div className="absolute inset-0 bg-burgundy/70" />
         <div className="relative z-10 mx-auto max-w-3xl px-4 py-20">
           <h1 className="font-display text-4xl font-bold drop-shadow sm:text-6xl">
-            {r('settings.site_name', 'מצהלות חתנים / Mitzhalos Chasanim')}
+            {r('brand.name', locale === 'he' ? 'מצהלות חתנים' : 'Mitzhalos Chasanim')}
           </h1>
-          <p className="mt-4 font-serif text-2xl text-gold-soft sm:text-3xl">{r('home.tagline_he', 'לבוש חתן הוא מצווה')}</p>
-          <p className="font-sans text-lg text-white/90">{r('home.tagline_en', 'Clothing a Groom is a Mitzvah')}</p>
+          <p className="mt-4 font-serif text-2xl text-gold-soft sm:text-3xl">
+            {r('home.tagline', locale === 'he' ? 'לבוש חתן הוא מצווה' : 'Clothing a Groom is a Mitzvah')}
+          </p>
           {t('home.hero_sub') && <p className="mx-auto mt-3 max-w-xl font-sans text-white/80">{t('home.hero_sub')}</p>}
           <Link href="/sponsor" className="btn-gold mt-8 !px-8 !py-3 text-base">
             {r('home.cta', 'Sponsor a Couple')}
@@ -59,7 +60,7 @@ export default async function HomePage({ params: { locale } }: { params: { local
               {news.map((p) => (
                 <Link key={p.id} href={`/news/${p.slug}`} className="card block transition-shadow hover:shadow-glow">
                   <p className="font-sans text-xs text-charcoal/50">
-                    {p.published_at ? formatDateLabel(p.published_at.slice(0, 10), locale) : ''}
+                    {p.published_at ? localeDate(p.published_at.slice(0, 10), locale) : ''}
                   </p>
                   <h3 className="mt-1 font-display text-lg font-bold text-burgundy">
                     {locale === 'he' ? p.title_he || p.title_en : p.title_en}

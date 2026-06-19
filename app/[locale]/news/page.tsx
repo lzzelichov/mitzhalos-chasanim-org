@@ -2,7 +2,7 @@ import { Link } from '@/i18n/routing';
 import { setRequestLocale } from 'next-intl/server';
 import { getSiteContent, contentRaw } from '@/lib/siteContent';
 import { getPublishedNews } from '@/lib/data';
-import { formatDateLabel } from '@/lib/utils';
+import { localeDate } from '@/lib/hebcal';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +22,7 @@ export default async function NewsPage({ params: { locale } }: { params: { local
           {posts.map((p) => (
             <Link key={p.id} href={`/news/${p.slug}`} className="card block transition-shadow hover:shadow-glow">
               <p className="font-sans text-xs text-charcoal/50">
-                {p.published_at ? formatDateLabel(p.published_at.slice(0, 10), locale) : ''}
+                {p.published_at ? localeDate(p.published_at.slice(0, 10), locale) : ''}
               </p>
               <h2 className="mt-1 font-display text-2xl font-bold text-burgundy">
                 {locale === 'he' ? p.title_he || p.title_en : p.title_en}

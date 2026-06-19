@@ -4,7 +4,8 @@ import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { getNewsBySlug } from '@/lib/data';
 import { getSiteContent, settingOn } from '@/lib/siteContent';
-import { formatDateLabel, getSiteUrl } from '@/lib/utils';
+import { getSiteUrl } from '@/lib/utils';
+import { localeDate } from '@/lib/hebcal';
 import { waFill, WHATSAPP_TEMPLATES } from '@/lib/whatsapp';
 import WhatsAppShare from '@/components/WhatsAppShare';
 import CopyLinkButton from '@/components/CopyLinkButton';
@@ -40,7 +41,7 @@ export default async function NewsPostPage({
   return (
     <article className="mx-auto max-w-2xl px-4 py-10">
       <p className="font-sans text-sm text-charcoal/50">
-        {post.published_at ? formatDateLabel(post.published_at.slice(0, 10), locale) : ''}
+        {post.published_at ? localeDate(post.published_at.slice(0, 10), locale) : ''}
       </p>
       <h1 className="mt-1 font-display text-4xl font-bold text-burgundy">{title}</h1>
       {post.photo_url && (

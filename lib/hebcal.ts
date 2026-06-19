@@ -4,7 +4,7 @@
 import { HDate } from '@hebcal/hdate';
 import { getHolidaysOnDate } from '@hebcal/core/dist/esm/holidays';
 import { flags } from '@hebcal/core/dist/esm/event';
-import { toISODate } from './utils';
+import { toISODate, formatDateLabel } from './utils';
 
 // Israel holiday schedule (the site is Jerusalem-focused).
 const IL = true;
@@ -42,6 +42,14 @@ export function hebrewFull(iso: string): string {
   const d = new Date(iso + 'T00:00:00');
   if (isNaN(d.getTime())) return iso;
   return hebrewInfo(d).full;
+}
+
+/**
+ * Single-language date: Hebrew calendar for the 'he' locale, Gregorian for 'en'.
+ * Never shows both — used everywhere a date is displayed publicly.
+ */
+export function localeDate(iso: string, locale: string): string {
+  return locale === 'he' ? hebrewFull(iso) : formatDateLabel(iso, locale);
 }
 
 export interface DayHoliday {

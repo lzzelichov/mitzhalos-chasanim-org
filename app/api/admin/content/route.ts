@@ -13,6 +13,21 @@ export async function GET() {
     .from('site_content')
     .select('key, value_en, value_he, is_visible, section, label, type');
   const dbMap = Object.fromEntries((data ?? []).map((r) => [r.key, r]));
+
+  // Auto-seed any default keys missing from the DB so nothing is ever empty.
+  const missing = DEFAULT_CONTENT.filter((d) => !dbMap[d.key]).map((d) => ({
+    key: d.key,
+    section: d.section,
+    label: d.label,
+    type: d.type,
+    value_en: d.value_en,
+    value_he: d.value_he,
+    is_visible: d.is_visible,
+  }));
+  if (missing.length) {
+    await g.sb.from('site_content').upsert(missing, { onConflict: 'key' });
+  }
+
   const rows = DEFAULT_CONTENT.map((d) => ({ ...d, ...(dbMap[d.key] || {}) }));
   return NextResponse.json({ rows });
 }

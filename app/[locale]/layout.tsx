@@ -25,7 +25,7 @@ export async function generateMetadata({
   params: { locale: string };
 }): Promise<Metadata> {
   const content = await getSiteContent();
-  const name = contentRaw(content, 'settings.site_name', locale, 'Mitzhalos Chasanim');
+  const name = contentRaw(content, 'brand.name', locale, locale === 'he' ? 'מצהלות חתנים' : 'Mitzhalos Chasanim');
   return {
     title: { default: name, template: `%s · ${name}` },
     description: 'Mitzhalos Chasanim — full wedding clothing packages for poor chassidish couples.',
@@ -48,7 +48,7 @@ export default async function LocaleLayout({
   const settings = extractSettings(content);
   const dir = locale === 'he' ? 'rtl' : 'ltr';
 
-  const siteName = contentRaw(content, 'settings.site_name', locale, 'Mitzhalos Chasanim');
+  const siteName = contentRaw(content, 'brand.name', locale, locale === 'he' ? 'מצהלות חתנים' : 'Mitzhalos Chasanim');
   const nav = {
     home: contentRaw(content, 'nav.home', locale, 'Home'),
     about: contentRaw(content, 'nav.about', locale, 'About'),
@@ -57,9 +57,8 @@ export default async function LocaleLayout({
     contact: contentRaw(content, 'nav.contact', locale, 'Contact'),
   };
   const footer = {
-    taglineHe: contentRaw(content, 'footer.tagline_he', locale, 'לבוש חתן הוא מצווה'),
-    taglineEn: contentRaw(content, 'footer.tagline_en', locale, 'Clothing a Groom is a Mitzvah'),
-    rights: contentRaw(content, 'footer.rights', locale, 'All rights reserved'),
+    tagline: contentRaw(content, 'footer.tagline', locale, locale === 'he' ? 'לבוש חתן הוא מצווה' : 'Clothing a Groom is a Mitzvah'),
+    rights: contentRaw(content, 'footer.rights', locale, locale === 'he' ? 'כל הזכויות שמורות' : 'All rights reserved'),
   };
 
   return (

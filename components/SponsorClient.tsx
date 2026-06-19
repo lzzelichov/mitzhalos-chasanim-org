@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { hebrewFull } from '@/lib/hebcal';
-import { formatDateLabel } from '@/lib/utils';
+import { localeDate } from '@/lib/hebcal';
 import { useSetting } from './SiteContentProvider';
 import CoupleCard from './CoupleCard';
 import SponsorModal from './SponsorModal';
@@ -52,9 +51,7 @@ export default function SponsorClient({ labels, locale }: { labels: SponsorLabel
           className="field text-center"
         />
         {validDate && (
-          <p className="mt-3 font-serif text-lg text-burgundy">
-            {hebrewFull(date)} · {formatDateLabel(date, locale)}
-          </p>
+          <p className="mt-3 font-serif text-lg text-burgundy">{localeDate(date, locale)}</p>
         )}
       </div>
 
