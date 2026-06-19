@@ -260,25 +260,20 @@ html[lang='he'] .story-content {
 /* === SUIT FABRIC TEXTURE (user photo: public/textures/fabric.jpg) === */
 .fabric-bg {
   background-color: #111118;
-  background-image: url('/textures/fabric.jpg');
-  background-repeat: repeat;
-  background-size: 400px 400px;
+  background-image: url('/textures/fabric-dark.jpg');
+  background-size: cover;
+  background-position: center;
 }
 
 .fabric-navbar {
   background-color: #0a0a10;
-  background-image: url('/textures/fabric.jpg');
-  background-repeat: repeat;
-  background-size: 300px 300px;
+  background-image: url('/textures/fabric-dark.jpg');
+  background-size: cover;
+  background-position: center;
 }
 
 .fabric-bg-light {
   background-color: #fdf8f0;
-  background-image: url('/textures/fabric.jpg');
-  background-repeat: repeat;
-  background-size: 350px 350px;
-  background-blend-mode: luminosity;
-  opacity: 0.96;
 }
 
 .fabric-divider {
@@ -290,13 +285,17 @@ html[lang='he'] .story-content {
 .hero-section {
   position: relative;
   isolation: isolate;
+  background-color: #1a1a1f;
+  background-image: url('/textures/fabric-gray.jpg');
+  background-size: cover;
+  background-position: center;
 }
 .hero-section::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(160deg, rgba(80, 15, 35, 0.8) 0%, rgba(15, 10, 22, 0.88) 100%);
+  background: linear-gradient(160deg, rgba(80, 15, 35, 0.62) 0%, rgba(15, 10, 22, 0.74) 100%);
 }
 
 /* Text on dark fabric (hero / navbar / footer) — keep everything legible */

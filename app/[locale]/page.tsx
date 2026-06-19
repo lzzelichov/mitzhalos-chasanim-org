@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { setRequestLocale } from 'next-intl/server';
 import { getSiteContent, contentRaw, contentText, settingOn } from '@/lib/siteContent';
@@ -7,8 +6,6 @@ import { localeDate } from '@/lib/hebcal';
 import StatCounter from '@/components/StatCounter';
 
 export const dynamic = 'force-dynamic';
-
-const HERO = 'https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=1920&q=80';
 
 export default async function HomePage({ params: { locale } }: { params: { locale: string } }) {
   setRequestLocale(locale);
@@ -36,7 +33,6 @@ export default async function HomePage({ params: { locale } }: { params: { local
       )}
 
       <section className="hero-section flex min-h-[70vh] items-center justify-center overflow-hidden text-center text-white">
-        <Image src={HERO} alt="" fill priority sizes="100vw" className="object-cover" />
         <div className="relative z-10 mx-auto max-w-3xl px-4 py-20">
           <h1 className="font-display text-4xl font-bold drop-shadow sm:text-6xl">
             {r('brand.name', locale === 'he' ? 'מצהלות חתנים' : 'Mitzhalos Chasanim')}
