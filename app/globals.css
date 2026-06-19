@@ -276,7 +276,7 @@ html[lang='he'] .story-content {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(170deg, rgba(60, 10, 25, 0.6) 0%, rgba(10, 8, 18, 0.72) 100%);
+  background: linear-gradient(170deg, rgba(60, 10, 25, 0.82) 0%, rgba(10, 8, 18, 0.92) 100%);
 }
 
 /* Content (light) headings — dark brown. Listed BEFORE the hero rule so heroes win. */
