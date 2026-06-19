@@ -89,3 +89,49 @@ export async function getOrgPhotos(): Promise<OrgPhoto[]> {
   const { data } = await sb.from('org_photos').select('*').order('sort_order', { ascending: true });
   return (data as OrgPhoto[]) ?? [];
 }
+
+export interface DateCount {
+  count: number;
+  fully: boolean; // true only when EVERY active couple that day is fully funded
+}
+
+/**
+ * One query → per-date couple counts for the calendar (no per-day fetching).
+ * `fully` is true when all that day's active couples have reached their price.
+ */
+export async function getCoupleDateCounts(): Promise<Record<string, DateCount>> {
+  const sb = getSupabaseAnon();
+  if (!sb) return {};
+  const { data } = await sb
+    .from('couples')
+    .select('wedding_date, total_raised, package_price')
+    .eq('status', 'active');
+  const m: Record<string, DateCount> = {};
+  for (const c of data ?? []) {
+    const d = c.wedding_date as string;
+    const price = Number(c.package_price) || 0;
+    const raised = Number(c.total_raised) || 0;
+    const isFull = price > 0 && raised >= price;
+    if (!m[d]) m[d] = { count: 0, fully: true };
+    m[d].count++;
+    if (!isFull) m[d].fully = false;
+  }
+  return m;
+}
+
+/** Active couples getting married in the next 7 days (for the live counter). */
+export async function getThisWeekCount(): Promise<number> {
+  const sb = getSupabaseAnon();
+  if (!sb) return 0;
+  const today = new Date();
+  const end = new Date();
+  end.setDate(today.getDate() + 7);
+  const iso = (d: Date) => d.toISOString().slice(0, 10);
+  const { count } = await sb
+    .from('couples')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'active')
+    .gte('wedding_date', iso(today))
+    .lte('wedding_date', iso(end));
+  return count ?? 0;
+}

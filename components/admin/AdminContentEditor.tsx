@@ -12,6 +12,8 @@ interface Row {
   value_en: string;
   value_he: string;
   is_visible: boolean;
+  default_en?: string;
+  default_he?: string;
 }
 
 const SECTION_META: Record<string, string> = {
@@ -38,7 +40,7 @@ function StatusBadge({ status }: { status: Status }) {
     failed: { text: '✗ Failed', cls: 'text-red-600' },
   } as const;
   const m = map[status];
-  return <span className={`font-sans text-xs font-semibold transition-opacity ${m.cls}`}>{m.text}</span>;
+  return <span className={`font-sans text-xs font-semibold ${m.cls}`}>{m.text}</span>;
 }
 
 /** One auto-saving row. Saves on toggle/visibility change and on text blur. */
@@ -74,6 +76,10 @@ function ContentRowBase({ row }: { row: Row }) {
     }
   }
 
+  function resetDefault() {
+    persist({ ...val, value_en: row.default_en ?? '', value_he: row.default_he ?? '', is_visible: true });
+  }
+
   const isToggle = row.type === 'toggle';
   const isSettingValue = row.section === 'settings' && !isToggle;
 
@@ -81,7 +87,12 @@ function ContentRowBase({ row }: { row: Row }) {
     <div className="card">
       <div className="mb-2 flex items-center justify-between gap-2">
         <p className="font-sans text-sm font-semibold text-charcoal/80">{row.label}</p>
-        <StatusBadge status={status} />
+        <div className="flex items-center gap-3">
+          <StatusBadge status={status} />
+          <button onClick={resetDefault} className="font-sans text-xs text-charcoal/40 underline hover:text-burgundy" title="Reset to default">
+            reset
+          </button>
+        </div>
       </div>
 
       {isToggle ? (
@@ -135,6 +146,7 @@ const ContentRow = memo(ContentRowBase);
 
 export default function AdminContentEditor({ mode }: { mode: 'content' | 'settings' }) {
   const [rows, setRows] = useState<Row[] | null>(null);
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -146,7 +158,10 @@ export default function AdminContentEditor({ mode }: { mode: 'content' | 'settin
 
   if (!rows) return <Spinner label="Loading…" />;
 
-  const shown = rows.filter((r) => (mode === 'settings' ? r.section === 'settings' : r.section !== 'settings'));
+  const q = query.trim().toLowerCase();
+  const shown = rows
+    .filter((r) => (mode === 'settings' ? r.section === 'settings' : r.section !== 'settings'))
+    .filter((r) => !q || `${r.label} ${r.key} ${r.value_en} ${r.value_he}`.toLowerCase().includes(q));
   const sections = Array.from(new Set(shown.map((r) => r.section)));
 
   return (
@@ -157,20 +172,31 @@ export default function AdminContentEditor({ mode }: { mode: 'content' | 'settin
       <h1 className="font-display text-3xl font-bold text-burgundy">
         {mode === 'settings' ? 'Site Settings' : 'Content CMS'}
       </h1>
-      <p className="mb-6 font-sans text-sm text-charcoal/50">Changes save automatically.</p>
+      <p className="mb-4 font-sans text-sm text-charcoal/50">Changes save automatically.</p>
 
-      <div className="space-y-8">
-        {sections.map((sec) => (
-          <section key={sec}>
-            <h2 className="mb-3 font-display text-xl font-bold text-burgundy">{SECTION_META[sec] || sec}</h2>
-            <div className="space-y-4">
-              {shown.filter((r) => r.section === sec).map((r) => (
-                <ContentRow key={r.key} row={r} />
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="🔍 Search labels and text…"
+        className="field mb-6"
+      />
+
+      {sections.length === 0 ? (
+        <p className="font-sans text-charcoal/50">No matches.</p>
+      ) : (
+        <div className="space-y-8">
+          {sections.map((sec) => (
+            <section key={sec}>
+              <h2 className="mb-3 font-display text-xl font-bold text-burgundy">{SECTION_META[sec] || sec}</h2>
+              <div className="space-y-4">
+                {shown.filter((r) => r.section === sec).map((r) => (
+                  <ContentRow key={r.key} row={r} />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

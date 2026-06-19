@@ -62,6 +62,7 @@ export const DEFAULT_CONTENT: SiteContentRow[] = [
   T('home.tagline', 'homepage', 'Hero Tagline', 'Clothing a Groom is a Mitzvah', 'לבוש חתן הוא מצווה'),
   T('home.hero_sub', 'homepage', 'Hero Subtitle', 'Full wedding clothing packages for poor chassidish couples.', 'חבילות לבוש מלאות לזוגות חסידיים נזקקים.', 'textarea'),
   T('home.cta', 'homepage', 'Hero CTA Button', 'Sponsor a Couple', 'תמכו בחתן'),
+  T('mobile.cta', 'homepage', 'Mobile Donate Button', 'Sponsor a Chassan', 'תמכו בחתן'),
   T('home.stat_couples', 'homepage', 'Stat label: couples', 'couples helped', 'חתנים שנעזרו'),
   T('home.stat_packages', 'homepage', 'Stat label: packages', 'packages sponsored', 'חבילות שנתרמו'),
   T('home.stat_raised', 'homepage', 'Stat label: raised', 'raised total', 'נאסף עד כה'),
@@ -72,6 +73,7 @@ export const DEFAULT_CONTENT: SiteContentRow[] = [
   T('home.box3_title', 'homepage', 'Box 3 Title', 'How to sponsor?', 'איך תורמים?'),
   T('home.box3_body', 'homepage', 'Box 3 Body', 'Pick a meaningful date, see the couples marrying that day, and sponsor a full package or any amount.', 'בחרו תאריך משמעותי, ראו את החתנים המתחתנים באותו יום, ותרמו חבילה מלאה או כל סכום.', 'textarea'),
   T('home.news_title', 'homepage', 'Latest News Heading', 'Latest News', 'חדשות אחרונות'),
+  T('home.live_counter', 'homepage', 'Live Counter (use {n} for the number)', 'This week: {n} chassanim need clothing support', 'השבוע: {n} חתנים זקוקים לתמיכה בלבוש'),
 
   // ── About ──
   T('about.title', 'about', 'Page Title', 'About Us', 'אודותינו'),
@@ -99,6 +101,13 @@ export const DEFAULT_CONTENT: SiteContentRow[] = [
   T('sponsor.any_btn', 'sponsor', 'Any Amount Button', 'Donate Any Amount', 'כל סכום'),
   T('sponsor.yeshiva_label', 'sponsor', 'Field: Yeshiva', 'Learned at', 'למד ב'),
   T('sponsor.chassidus_label', 'sponsor', 'Field: Chassidus', 'Chassidus', 'חסידות'),
+  T('sponsor.father_label', 'sponsor', 'Field: Father', 'Father', 'האב'),
+  T('sponsor.mother_label', 'sponsor', 'Field: Mother', 'Mother', 'האם'),
+  T('sponsor.chatan_prefix', 'sponsor', 'Chatan prefix', 'Chatan', 'חתן'),
+  T('sponsor.calendar_subtitle', 'sponsor', 'Calendar Subtitle', 'See which chassanim need your help that day', 'ראו אילו חתנים זקוקים לעזרתכם באותו יום'),
+  T('sponsor.legend_gold', 'sponsor', 'Legend: Gold', 'Couples need help', 'חתנים זקוקים לעזרה'),
+  T('sponsor.legend_burgundy', 'sponsor', 'Legend: Burgundy', 'Fully sponsored', 'מומן במלואו'),
+  T('sponsor.legend_gray', 'sponsor', 'Legend: Gray', 'No couples', 'אין חתנים'),
 
   // ── News ──
   T('news.title', 'news', 'Page Title', 'News', 'חדשות'),
@@ -156,6 +165,7 @@ export const DEFAULT_CONTENT: SiteContentRow[] = [
   TOGGLE('show_whatsapp', 'Show WhatsApp share buttons'),
   TOGGLE('enable_contact_form', 'Enable contact form'),
   TOGGLE('enable_donations', 'Enable donations (master kill switch)'),
+  TOGGLE('show_live_counter', 'Show live "this week" counter on homepage', false),
   // Hidden sponsorship options (off by default).
   TOGGLE('opt_specific_item', 'Hidden option: sponsor a specific item', false),
   TOGGLE('opt_recurring', 'Hidden option: recurring monthly donation', false),

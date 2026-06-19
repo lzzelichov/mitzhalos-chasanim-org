@@ -33,7 +33,7 @@ export default function CoupleCard({
     <div className="card flex flex-col gap-3">
       <div>
         <h3 className="font-display text-2xl font-bold text-burgundy">
-          {he ? 'חתן ' : 'Chatan '}
+          {labels.chatanPrefix}{' '}
           {name}
           {alt && alt !== name ? <span className="text-charcoal/50"> ({alt})</span> : null}
         </h3>

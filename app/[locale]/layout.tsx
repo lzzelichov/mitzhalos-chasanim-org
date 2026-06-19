@@ -7,6 +7,7 @@ import { routing, isValidLocale } from '@/i18n/routing';
 import { getSiteContent, contentRaw, extractSettings } from '@/lib/siteContent';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import MobileDonateCta from '@/components/MobileDonateCta';
 import { SiteContentProvider } from '@/components/SiteContentProvider';
 import '../globals.css';
 
@@ -60,6 +61,7 @@ export default async function LocaleLayout({
     tagline: contentRaw(content, 'footer.tagline', locale, locale === 'he' ? 'לבוש חתן הוא מצווה' : 'Clothing a Groom is a Mitzvah'),
     rights: contentRaw(content, 'footer.rights', locale, locale === 'he' ? 'כל הזכויות שמורות' : 'All rights reserved'),
   };
+  const mobileCta = contentRaw(content, 'mobile.cta', locale, locale === 'he' ? 'תמכו בחתן' : 'Sponsor a Chassan');
 
   return (
     <html lang={locale} dir={dir} className={`${cormorant.variable} ${playfair.variable} ${lato.variable} ${notoHe.variable}`}>
@@ -69,6 +71,8 @@ export default async function LocaleLayout({
             <Navbar locale={locale} siteName={siteName} nav={nav} />
             <main className="min-h-[55vh]">{children}</main>
             <Footer siteName={siteName} footer={footer} />
+            <div className="h-20 md:hidden" aria-hidden />
+            <MobileDonateCta label={mobileCta} />
           </SiteContentProvider>
         </NextIntlClientProvider>
       </body>

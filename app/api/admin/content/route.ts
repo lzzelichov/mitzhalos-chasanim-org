@@ -28,7 +28,12 @@ export async function GET() {
     await g.sb.from('site_content').upsert(missing, { onConflict: 'key' });
   }
 
-  const rows = DEFAULT_CONTENT.map((d) => ({ ...d, ...(dbMap[d.key] || {}) }));
+  const rows = DEFAULT_CONTENT.map((d) => ({
+    ...d,
+    ...(dbMap[d.key] || {}),
+    default_en: d.value_en,
+    default_he: d.value_he,
+  }));
   return NextResponse.json({ rows });
 }
 

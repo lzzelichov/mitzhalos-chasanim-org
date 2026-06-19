@@ -2,9 +2,9 @@ import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { setRequestLocale } from 'next-intl/server';
 import { getSiteContent, contentRaw, contentText, settingOn } from '@/lib/siteContent';
-import { getOrgStats, getPublishedNews } from '@/lib/data';
-import { formatCurrency } from '@/lib/currency';
+import { getOrgStats, getPublishedNews, getThisWeekCount } from '@/lib/data';
 import { localeDate } from '@/lib/hebcal';
+import StatCounter from '@/components/StatCounter';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,16 +13,32 @@ const HERO = 'https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=1920&q
 export default async function HomePage({ params: { locale } }: { params: { locale: string } }) {
   setRequestLocale(locale);
   const c = await getSiteContent();
-  const [stats, news] = await Promise.all([getOrgStats(), getPublishedNews(3)]);
+  const showLive = settingOn(c, 'show_live_counter', false);
+  const [stats, news, weekCount] = await Promise.all([
+    getOrgStats(),
+    getPublishedNews(3),
+    showLive ? getThisWeekCount() : Promise.resolve(0),
+  ]);
   const showAmounts = settingOn(c, 'show_amounts', true);
   const r = (k: string, f = '') => contentRaw(c, k, locale, f);
   const t = (k: string, f = '') => contentText(c, k, locale, f);
 
+  const [livePre, livePost] = r('home.live_counter', 'This week: {n} chassanim need clothing support').split('{n}');
+
   return (
     <>
+      {showLive && weekCount > 0 && (
+        <div className="bg-burgundy py-2 text-center font-sans text-sm font-semibold text-gold">
+          {livePre}
+          <span className="num-pulse">{weekCount}</span>
+          {livePost ?? ''}
+        </div>
+      )}
+
       <section className="relative isolate flex min-h-[70vh] items-center justify-center overflow-hidden text-center text-white">
         <Image src={HERO} alt="" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-burgundy/70" />
+        <div className="fabric-hero absolute inset-0" aria-hidden />
         <div className="relative z-10 mx-auto max-w-3xl px-4 py-20">
           <h1 className="font-display text-4xl font-bold drop-shadow sm:text-6xl">
             {r('brand.name', locale === 'he' ? 'מצהלות חתנים' : 'Mitzhalos Chasanim')}
@@ -39,9 +55,16 @@ export default async function HomePage({ params: { locale } }: { params: { local
 
       <div className="mx-auto max-w-6xl px-4">
         <section className="relative z-10 -mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Stat value={String(stats.couplesHelped)} label={r('home.stat_couples', 'couples helped')} />
-          <Stat value={String(stats.packagesSponsored)} label={r('home.stat_packages', 'packages sponsored')} />
-          <Stat value={showAmounts ? formatCurrency(stats.totalRaised) : '—'} label={r('home.stat_raised', 'raised total')} />
+          <StatCounter end={stats.couplesHelped} label={r('home.stat_couples', 'couples helped')} />
+          <StatCounter end={stats.packagesSponsored} label={r('home.stat_packages', 'packages sponsored')} />
+          {showAmounts ? (
+            <StatCounter end={stats.totalRaised} prefix="$" label={r('home.stat_raised', 'raised total')} />
+          ) : (
+            <div className="card text-center">
+              <p className="font-display text-4xl font-bold text-burgundy">—</p>
+              <p className="font-sans text-sm text-charcoal/60">{r('home.stat_raised', 'raised total')}</p>
+            </div>
+          )}
         </section>
 
         <section className="mt-14 grid gap-6 md:grid-cols-3">
@@ -75,14 +98,5 @@ export default async function HomePage({ params: { locale } }: { params: { local
         )}
       </div>
     </>
-  );
-}
-
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="card text-center">
-      <p className="font-display text-4xl font-bold text-burgundy">{value}</p>
-      <p className="font-sans text-sm text-charcoal/60">{label}</p>
-    </div>
   );
 }

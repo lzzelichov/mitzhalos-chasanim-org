@@ -41,7 +41,7 @@ export default function Navbar({
   const other = locale === 'he' ? 'en' : 'he';
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gold/30 bg-ivory/90 backdrop-blur">
+    <header className="fabric-navbar sticky top-0 z-50 border-b border-gold/30 bg-ivory/90 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link href="/" className="font-display text-lg font-bold leading-tight text-burgundy sm:text-xl">
           {siteName}

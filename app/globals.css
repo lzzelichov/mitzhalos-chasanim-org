@@ -244,3 +244,57 @@ html[lang='he'] .story-content {
   min-height: 140px;
   font-family: var(--font-lato), system-ui, sans-serif;
 }
+
+/* ── Fabric texture (subtle, tailored feel) ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80');
+  background-size: 300px 300px;
+  background-repeat: repeat;
+  opacity: 0.04;
+}
+.fabric-navbar {
+  background-image:
+    linear-gradient(rgba(253, 248, 240, 0.9), rgba(253, 248, 240, 0.9)),
+    url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80');
+  background-size: auto, 300px 300px;
+  background-repeat: repeat;
+}
+.fabric-hero {
+  background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80');
+  background-size: 300px 300px;
+  background-repeat: repeat;
+  opacity: 0.06;
+  mix-blend-mode: multiply;
+}
+
+/* ── Animations ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.fade-in-up { animation: fadeInUp 0.5s ease-out both; }
+
+@keyframes numPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+.num-pulse { display: inline-block; animation: numPulse 1.8s ease-in-out infinite; }
+
+/* ── Floating mobile donate button ── */
+.mobile-cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding: 14px 20px;
+  padding-bottom: max(14px, env(safe-area-inset-bottom));
+}
+@media (min-width: 768px) {
+  .mobile-cta { display: none !important; }
+}
