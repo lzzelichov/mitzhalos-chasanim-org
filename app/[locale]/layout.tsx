@@ -79,7 +79,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={dir} className={`${frankRuhl.variable} ${raleway.variable} ${suezOne.variable}`}>
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased fabric-bg-light">
         <NextIntlClientProvider messages={messages}>
           <SiteContentProvider settings={settings}>
             <Navbar locale={locale} siteName={siteName} nav={nav} />

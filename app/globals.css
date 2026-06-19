@@ -18,12 +18,8 @@ body {
 
 body {
   color: var(--charcoal);
-  background:
-    radial-gradient(1100px 500px at 50% -8%, rgba(201, 168, 76, 0.14), transparent 60%),
-    radial-gradient(900px 500px at 100% 100%, rgba(122, 31, 61, 0.06), transparent 60%),
-    var(--ivory);
-  background-attachment: fixed;
   min-height: 100vh;
+  /* Background texture comes from the .fabric-bg-light class on <body>. */
   /* Body — Frank Ruhl Libre (both languages) */
   font-family: var(--font-body), serif;
   font-weight: 400;
@@ -108,7 +104,10 @@ html[lang='he'] .story-content {
   }
 
   .card {
-    @apply rounded-2xl border border-gold/30 bg-white/85 p-6 shadow-sm;
+    @apply rounded-2xl border border-gold/30 bg-white/85 p-6;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 2px 8px rgba(0, 0, 0, 0.15);
   }
 
   /* Luxury wedding-invitation card */
@@ -262,31 +261,49 @@ html[lang='he'] .story-content {
   font-family: var(--font-body), serif;
 }
 
-/* ── Fabric texture (subtle, tailored feel) ── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80');
-  background-size: 300px 300px;
-  background-repeat: repeat;
-  opacity: 0.04;
-}
-.fabric-navbar {
+/* === CHASSIDIC SUIT FABRIC TEXTURE (pure CSS) === */
+.fabric-bg {
+  background-color: #1a1a1f;
   background-image:
-    linear-gradient(rgba(253, 248, 240, 0.9), rgba(253, 248, 240, 0.9)),
-    url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80');
-  background-size: auto, 300px 300px;
-  background-repeat: repeat;
+    repeating-linear-gradient(45deg, transparent 0px, transparent 1px, rgba(255,255,255,0.015) 1px, rgba(255,255,255,0.015) 2px),
+    repeating-linear-gradient(-45deg, transparent 0px, transparent 1px, rgba(255,255,255,0.01) 1px, rgba(255,255,255,0.01) 2px),
+    repeating-linear-gradient(90deg, transparent 0px, transparent 18px, rgba(255,255,255,0.06) 18px, rgba(255,255,255,0.06) 19px, transparent 19px, transparent 37px, rgba(255,255,255,0.03) 37px, rgba(255,255,255,0.03) 38px);
+  background-size: 4px 4px, 4px 4px, 38px 100%;
 }
-.fabric-hero {
-  background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80');
-  background-size: 300px 300px;
-  background-repeat: repeat;
-  opacity: 0.06;
-  mix-blend-mode: multiply;
+
+.fabric-bg-light {
+  background-color: #fdf8f0;
+  background-image:
+    repeating-linear-gradient(45deg, transparent 0px, transparent 1px, rgba(0,0,0,0.012) 1px, rgba(0,0,0,0.012) 2px),
+    repeating-linear-gradient(-45deg, transparent 0px, transparent 1px, rgba(0,0,0,0.008) 1px, rgba(0,0,0,0.008) 2px);
+  background-size: 3px 3px, 3px 3px;
+}
+
+.fabric-navbar {
+  background-color: #111118;
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0px, transparent 23px, rgba(255,255,255,0.07) 23px, rgba(255,255,255,0.07) 24px),
+    repeating-linear-gradient(45deg, transparent 0px, transparent 1px, rgba(255,255,255,0.02) 1px, rgba(255,255,255,0.02) 2px);
+  background-size: 24px 100%, 3px 3px;
+}
+
+.fabric-divider {
+  height: 4px;
+  background: linear-gradient(90deg, #111118 0%, #2a2a35 30%, #c9a84c 50%, #2a2a35 70%, #111118 100%);
+}
+
+/* Hero photo + pinstripe overlay */
+.hero-section {
+  position: relative;
+  isolation: isolate;
+}
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-color: rgba(17, 17, 24, 0.65);
+  background-image: repeating-linear-gradient(90deg, transparent 0px, transparent 23px, rgba(255,255,255,0.04) 23px, rgba(255,255,255,0.04) 24px);
 }
 
 /* ── Animations ── */

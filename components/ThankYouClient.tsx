@@ -57,19 +57,19 @@ export default function ThankYouClient({
   });
 
   return (
-    <div className="mx-auto flex min-h-[55vh] max-w-xl flex-col items-center justify-center px-6 py-16 text-center">
+    <div className="mx-auto flex max-w-xl flex-col items-center justify-center px-6 py-16 text-center">
       <div className="text-6xl" aria-hidden>💛</div>
-      <h1 className="mt-3 font-display text-4xl font-bold text-burgundy">{labels.title}</h1>
-      {labels.subtitle && <p className="mt-2 font-sans text-charcoal/80">{labels.subtitle}</p>}
+      <h1 className="mt-3 font-display text-4xl font-bold text-white drop-shadow">{labels.title}</h1>
+      {labels.subtitle && <p className="mt-2 font-sans text-white/85">{labels.subtitle}</p>}
       {data.amount > 0 && (
-        <p className="mt-4 font-display text-2xl font-bold text-burgundy">
+        <p className="mt-4 font-display text-2xl font-bold text-gold">
           {formatCurrency(data.amount)}
           {data.chatan ? ` · ${locale === 'he' ? 'חתן' : 'Chatan'} ${data.chatan}` : ''}
         </p>
       )}
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <WhatsAppShare text={wa} label={labels.share} />
-        <Link href="/" className="btn-ghost">
+        <Link href="/" className="btn-ghost !border-white/40 !bg-white/10 !text-white hover:!bg-white/20">
           {labels.back}
         </Link>
       </div>

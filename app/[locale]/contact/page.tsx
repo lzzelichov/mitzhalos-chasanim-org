@@ -1,9 +1,12 @@
+import Image from 'next/image';
 import { setRequestLocale } from 'next-intl/server';
 import { getSiteContent, contentRaw, settingOn } from '@/lib/siteContent';
 import { waChat } from '@/lib/whatsapp';
 import ContactForm from '@/components/ContactForm';
 
 export const dynamic = 'force-dynamic';
+
+const CONTACT_IMG = 'https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=1920&q=80';
 
 export default async function ContactPage({ params: { locale } }: { params: { locale: string } }) {
   setRequestLocale(locale);
@@ -17,45 +20,50 @@ export default async function ContactPage({ params: { locale } }: { params: { lo
   const wanum = r('settings.whatsapp_number');
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10">
-      <h1 className="mb-6 text-center font-display text-4xl font-bold text-burgundy">{r('contact.title', 'Contact Us')}</h1>
+    <div>
+      <section className="hero-section flex min-h-[40vh] items-center justify-center overflow-hidden text-center text-white">
+        <Image src={CONTACT_IMG} alt="" fill priority sizes="100vw" className="object-cover" />
+        <h1 className="relative z-10 font-display text-5xl font-bold drop-shadow">{r('contact.title', 'Contact Us')}</h1>
+      </section>
 
-      <div className="card mb-6 space-y-2 text-center font-sans text-charcoal/80">
-        {r('contact.address') && <p>{r('contact.address')}</p>}
-        {phone && (
-          <p>
-            📞 <a href={`tel:${phone}`} className="text-burgundy hover:underline">{phone}</a>
-          </p>
-        )}
-        {email && (
-          <p>
-            ✉️ <a href={`mailto:${email}`} className="text-burgundy hover:underline">{email}</a>
-          </p>
-        )}
-        {showWa && wanum && (
-          <p>
-            💬{' '}
-            <a href={waChat(wanum)} target="_blank" rel="noopener noreferrer" className="text-green-700 hover:underline">
-              WhatsApp
-            </a>
-          </p>
+      <div className="mx-auto max-w-2xl px-4 py-12">
+        <div className="card mb-6 space-y-2 text-center font-sans text-charcoal/80">
+          {r('contact.address') && <p>{r('contact.address')}</p>}
+          {phone && (
+            <p>
+              📞 <a href={`tel:${phone}`} className="text-burgundy hover:underline">{phone}</a>
+            </p>
+          )}
+          {email && (
+            <p>
+              ✉️ <a href={`mailto:${email}`} className="text-burgundy hover:underline">{email}</a>
+            </p>
+          )}
+          {showWa && wanum && (
+            <p>
+              💬{' '}
+              <a href={waChat(wanum)} target="_blank" rel="noopener noreferrer" className="text-green-700 hover:underline">
+                WhatsApp
+              </a>
+            </p>
+          )}
+        </div>
+
+        {formOn && (
+          <>
+            <h2 className="mb-3 text-center font-display text-2xl font-bold text-burgundy">{r('contact.form_title', 'Send us a message')}</h2>
+            <ContactForm
+              labels={{
+                name: r('contact.name_label', 'Your Name'),
+                email: r('contact.email_label', 'Your Email'),
+                message: r('contact.message_label', 'Message'),
+                submit: r('contact.submit', 'Send'),
+                success: r('contact.success', 'Thank you — we will be in touch.'),
+              }}
+            />
+          </>
         )}
       </div>
-
-      {formOn && (
-        <>
-          <h2 className="mb-3 text-center font-display text-2xl font-bold text-burgundy">{r('contact.form_title', 'Send us a message')}</h2>
-          <ContactForm
-            labels={{
-              name: r('contact.name_label', 'Your Name'),
-              email: r('contact.email_label', 'Your Email'),
-              message: r('contact.message_label', 'Message'),
-              submit: r('contact.submit', 'Send'),
-              success: r('contact.success', 'Thank you — we will be in touch.'),
-            }}
-          />
-        </>
-      )}
     </div>
   );
 }

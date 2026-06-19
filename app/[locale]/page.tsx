@@ -28,17 +28,15 @@ export default async function HomePage({ params: { locale } }: { params: { local
   return (
     <>
       {showLive && weekCount > 0 && (
-        <div className="bg-burgundy py-2 text-center font-sans text-sm font-semibold text-gold">
+        <div className="fabric-bg py-2 text-center font-sans text-sm font-semibold text-gold">
           {livePre}
           <span className="num-pulse">{weekCount}</span>
           {livePost ?? ''}
         </div>
       )}
 
-      <section className="relative isolate flex min-h-[70vh] items-center justify-center overflow-hidden text-center text-white">
+      <section className="hero-section flex min-h-[70vh] items-center justify-center overflow-hidden text-center text-white">
         <Image src={HERO} alt="" fill priority sizes="100vw" className="object-cover" />
-        <div className="absolute inset-0 bg-burgundy/70" />
-        <div className="fabric-hero absolute inset-0" aria-hidden />
         <div className="relative z-10 mx-auto max-w-3xl px-4 py-20">
           <h1 className="font-display text-4xl font-bold drop-shadow sm:text-6xl">
             {r('brand.name', locale === 'he' ? 'מצהלות חתנים' : 'Mitzhalos Chasanim')}
@@ -67,7 +65,9 @@ export default async function HomePage({ params: { locale } }: { params: { local
           )}
         </section>
 
-        <section className="mt-14 grid gap-6 md:grid-cols-3">
+        <div className="fabric-divider mt-12" />
+
+        <section className="mt-10 grid gap-6 md:grid-cols-3">
           {[1, 2, 3].map((n) => (
             <div key={n} className="card">
               <h3 className="font-display text-xl font-bold text-burgundy">{r(`home.box${n}_title`)}</h3>
@@ -78,6 +78,7 @@ export default async function HomePage({ params: { locale } }: { params: { local
 
         {news.length > 0 && (
           <section className="mt-16">
+            <div className="fabric-divider mb-12" />
             <h2 className="mb-6 text-center font-display text-3xl font-bold text-burgundy">{r('home.news_title', 'Latest News')}</h2>
             <div className="grid gap-5 md:grid-cols-3">
               {news.map((p) => (

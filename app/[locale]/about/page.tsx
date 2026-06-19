@@ -25,9 +25,8 @@ export default async function AboutPage({ params: { locale } }: { params: { loca
 
   return (
     <div>
-      <section className="relative isolate flex min-h-[40vh] items-center justify-center overflow-hidden text-center text-white">
+      <section className="hero-section flex min-h-[40vh] items-center justify-center overflow-hidden text-center text-white">
         <Image src={ABOUT_IMG} alt="" fill priority sizes="100vw" className="object-cover" />
-        <div className="absolute inset-0 bg-burgundy/70" />
         <h1 className="relative z-10 font-display text-5xl font-bold drop-shadow">{r('about.title', 'About Us')}</h1>
       </section>
 
@@ -47,6 +46,8 @@ export default async function AboutPage({ params: { locale } }: { params: { loca
             <PhotoGallery photos={photos} />
           </section>
         )}
+
+        <div className="fabric-divider" />
 
         <section className="card text-center">
           <h2 className="font-display text-2xl font-bold text-burgundy">{r('about.cta_title', 'Join Us')}</h2>

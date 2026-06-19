@@ -12,7 +12,7 @@ export default function Footer({
 }) {
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-16 border-t border-gold/30 bg-burgundy text-cream">
+    <footer className="fabric-bg mt-16 border-t border-gold/30 text-cream">
       <div className="mx-auto max-w-6xl px-4 py-10 text-center">
         <p className="font-display text-2xl font-bold text-gold">{siteName}</p>
         {footer.tagline && <p className="mt-2 font-serif text-lg italic text-cream/90">{footer.tagline}</p>}
