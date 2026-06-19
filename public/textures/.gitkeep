@@ -1,0 +1,3 @@
+# Drop the dark herringbone suit fabric photo here as: fabric.jpg
+# It is referenced by .fabric-bg / .fabric-navbar / .fabric-bg-light in app/globals.css.
+# Until fabric.jpg is added, those classes fall back to their solid background-color.

@@ -257,30 +257,28 @@ html[lang='he'] .story-content {
   font-family: var(--font-body), serif;
 }
 
-/* === CHASSIDIC SUIT FABRIC TEXTURE (pure CSS) === */
+/* === SUIT FABRIC TEXTURE (user photo: public/textures/fabric.jpg) === */
 .fabric-bg {
-  background-color: #1a1a1f;
-  background-image:
-    repeating-linear-gradient(45deg, transparent 0px, transparent 1px, rgba(255,255,255,0.015) 1px, rgba(255,255,255,0.015) 2px),
-    repeating-linear-gradient(-45deg, transparent 0px, transparent 1px, rgba(255,255,255,0.01) 1px, rgba(255,255,255,0.01) 2px),
-    repeating-linear-gradient(90deg, transparent 0px, transparent 18px, rgba(255,255,255,0.06) 18px, rgba(255,255,255,0.06) 19px, transparent 19px, transparent 37px, rgba(255,255,255,0.03) 37px, rgba(255,255,255,0.03) 38px);
-  background-size: 4px 4px, 4px 4px, 38px 100%;
+  background-color: #111118;
+  background-image: url('/textures/fabric.jpg');
+  background-repeat: repeat;
+  background-size: 400px 400px;
+}
+
+.fabric-navbar {
+  background-color: #0a0a10;
+  background-image: url('/textures/fabric.jpg');
+  background-repeat: repeat;
+  background-size: 300px 300px;
 }
 
 .fabric-bg-light {
   background-color: #fdf8f0;
-  background-image:
-    repeating-linear-gradient(45deg, transparent 0px, transparent 1px, rgba(0,0,0,0.012) 1px, rgba(0,0,0,0.012) 2px),
-    repeating-linear-gradient(-45deg, transparent 0px, transparent 1px, rgba(0,0,0,0.008) 1px, rgba(0,0,0,0.008) 2px);
-  background-size: 3px 3px, 3px 3px;
-}
-
-.fabric-navbar {
-  background-color: #111118;
-  background-image:
-    repeating-linear-gradient(90deg, transparent 0px, transparent 23px, rgba(255,255,255,0.07) 23px, rgba(255,255,255,0.07) 24px),
-    repeating-linear-gradient(45deg, transparent 0px, transparent 1px, rgba(255,255,255,0.02) 1px, rgba(255,255,255,0.02) 2px);
-  background-size: 24px 100%, 3px 3px;
+  background-image: url('/textures/fabric.jpg');
+  background-repeat: repeat;
+  background-size: 350px 350px;
+  background-blend-mode: luminosity;
+  opacity: 0.96;
 }
 
 .fabric-divider {
@@ -288,7 +286,7 @@ html[lang='he'] .story-content {
   background: linear-gradient(90deg, #111118 0%, #2a2a35 30%, #c9a84c 50%, #2a2a35 70%, #111118 100%);
 }
 
-/* Hero photo + pinstripe overlay */
+/* Hero photo + burgundy → dark gradient overlay (on top of the fabric/photo) */
 .hero-section {
   position: relative;
   isolation: isolate;
@@ -298,8 +296,19 @@ html[lang='he'] .story-content {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background-color: rgba(17, 17, 24, 0.65);
-  background-image: repeating-linear-gradient(90deg, transparent 0px, transparent 23px, rgba(255,255,255,0.04) 23px, rgba(255,255,255,0.04) 24px);
+  background: linear-gradient(160deg, rgba(80, 15, 35, 0.8) 0%, rgba(15, 10, 22, 0.88) 100%);
+}
+
+/* Text on dark fabric (hero / navbar / footer) — keep everything legible */
+.hero-section,
+.fabric-bg,
+.fabric-navbar {
+  color: #e8d5be;
+}
+.hero-section h1, .hero-section h2, .hero-section h3,
+.fabric-bg h1, .fabric-bg h2, .fabric-bg h3 {
+  color: #f5e6d3;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
 }
 
 /* ── Animations ── */
