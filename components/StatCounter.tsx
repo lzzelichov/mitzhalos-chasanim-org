@@ -44,11 +44,11 @@ export default function StatCounter({ end, prefix = '', label }: { end: number; 
   const v = useCountUp(end, run);
   return (
     <div ref={ref} className="card text-center">
-      <p className="font-display text-4xl font-bold text-burgundy">
+      <p className="font-display text-[2.5rem] font-black leading-none text-burgundy">
         {prefix}
         {Math.round(v).toLocaleString('en-US')}
       </p>
-      <p className="font-sans text-sm text-charcoal/60">{label}</p>
+      <p className="mt-2 font-sans text-[0.85rem] text-[#888]">{label}</p>
     </div>
   );
 }

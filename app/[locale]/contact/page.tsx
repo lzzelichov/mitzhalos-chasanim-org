@@ -1,9 +1,12 @@
+import Image from 'next/image';
 import { setRequestLocale } from 'next-intl/server';
 import { getSiteContent, contentRaw, settingOn } from '@/lib/siteContent';
 import { waChat } from '@/lib/whatsapp';
 import ContactForm from '@/components/ContactForm';
 
 export const dynamic = 'force-dynamic';
+
+const CONTACT_IMG = 'https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=1920&q=85';
 
 export default async function ContactPage({ params: { locale } }: { params: { locale: string } }) {
   setRequestLocale(locale);
@@ -18,8 +21,9 @@ export default async function ContactPage({ params: { locale } }: { params: { lo
 
   return (
     <div>
-      <section className="hero-section flex min-h-[40vh] items-center justify-center overflow-hidden text-center text-white">
-        <h1 className="relative z-10 font-display text-5xl font-bold drop-shadow">{r('contact.title', 'Contact Us')}</h1>
+      <section className="hero-section flex min-h-[40vh] items-center justify-center overflow-hidden text-center">
+        <Image src={CONTACT_IMG} alt="" fill priority sizes="100vw" className="object-cover" />
+        <h1 className="relative z-10 font-display">{r('contact.title', 'Contact Us')}</h1>
       </section>
 
       <div className="mx-auto max-w-2xl px-4 py-12">
@@ -47,7 +51,8 @@ export default async function ContactPage({ params: { locale } }: { params: { lo
 
         {formOn && (
           <>
-            <h2 className="mb-3 text-center font-display text-2xl font-bold text-burgundy">{r('contact.form_title', 'Send us a message')}</h2>
+            <h2 className="text-center font-display text-2xl font-bold">{r('contact.form_title', 'Send us a message')}</h2>
+            <span className="section-accent" />
             <ContactForm
               labels={{
                 name: r('contact.name_label', 'Your Name'),

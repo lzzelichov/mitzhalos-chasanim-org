@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Frank_Ruhl_Libre, Playfair_Display } from 'next/font/google';
+import { Frank_Ruhl_Libre } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
@@ -15,13 +15,6 @@ const frankRuhl = Frank_Ruhl_Libre({
   subsets: ['latin', 'hebrew'],
   weight: ['400', '700', '900'],
   variable: '--font-body',
-  display: 'swap',
-});
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '700', '900'],
-  style: ['normal', 'italic'],
-  variable: '--font-heading-en',
   display: 'swap',
 });
 
@@ -73,7 +66,7 @@ export default async function LocaleLayout({
   const mobileCta = contentRaw(content, 'mobile.cta', locale, locale === 'he' ? 'תמכו בחתן' : 'Sponsor a Chassan');
 
   return (
-    <html lang={locale} dir={dir} className={`${frankRuhl.variable} ${playfair.variable}`}>
+    <html lang={locale} dir={dir} className={frankRuhl.variable}>
       <body className="font-sans antialiased fabric-bg-light">
         <NextIntlClientProvider messages={messages}>
           <SiteContentProvider settings={settings}>

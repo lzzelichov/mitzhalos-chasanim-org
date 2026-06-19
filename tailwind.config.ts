@@ -20,11 +20,9 @@ const config: Config = {
         blush: '#f5e6d3',
       },
       fontFamily: {
-        // Headings — Playfair Display (en); Frank Ruhl Libre on [lang=he/yi] via globals.css
-        display: ['var(--font-heading-en)', 'serif'],
-        // Subheads / taglines render as body per the type system
+        // All headings + body — Frank Ruhl Libre 900 (headings) / 400 (body)
+        display: ['var(--font-body)', 'serif'],
         serif: ['var(--font-body)', 'serif'],
-        // Body — Frank Ruhl Libre (both languages)
         sans: ['var(--font-body)', 'serif'],
       },
       boxShadow: {

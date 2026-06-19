@@ -40,8 +40,9 @@ export default async function SponsorPage({ params: { locale } }: { params: { lo
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
-      <h1 className="text-center font-display text-4xl font-bold text-burgundy">{labels.title}</h1>
-      <p className="mx-auto mt-2 max-w-xl text-center font-sans text-charcoal/70">{labels.calSubtitle}</p>
+      <h1 className="text-center font-display text-4xl font-bold">{labels.title}</h1>
+      <span className="section-accent" />
+      <p className="mx-auto max-w-xl text-center font-sans text-charcoal/70">{labels.calSubtitle}</p>
       <div className="mt-8">
         <SponsorClient dateCounts={dateCounts} labels={labels} locale={locale} />
       </div>

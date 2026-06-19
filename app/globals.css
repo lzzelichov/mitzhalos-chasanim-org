@@ -17,14 +17,13 @@ body {
 }
 
 body {
-  color: var(--charcoal);
+  color: #3d2a1a;
   min-height: 100vh;
-  /* Background texture comes from the .fabric-bg-light class on <body>. */
   /* Body — Frank Ruhl Libre (both languages) */
   font-family: var(--font-body), serif;
   font-weight: 400;
   font-size: 16px;
-  line-height: 1.7;
+  line-height: 1.8;
 }
 
 /* RTL helper */
@@ -32,24 +31,12 @@ body {
   transform: scaleX(-1);
 }
 
-/* Headings — Playfair Display 900 (English) */
+/* Headings — Frank Ruhl Libre 900 (all languages) */
 h1, h2, h3, h4, h5, h6,
 .font-display {
-  font-family: var(--font-heading-en), serif;
-  font-weight: 900;
-  line-height: 1.15;
-}
-
-/* Headings — Frank Ruhl Libre 900 (Hebrew / Yiddish) */
-[lang='he'] h1, [lang='he'] h2, [lang='he'] h3,
-[lang='he'] h4, [lang='he'] h5, [lang='he'] h6,
-[lang='he'] .font-display,
-[lang='yi'] h1, [lang='yi'] h2, [lang='yi'] h3,
-[lang='yi'] h4, [lang='yi'] h5, [lang='yi'] h6,
-[lang='yi'] .font-display {
   font-family: var(--font-body), serif;
   font-weight: 900;
-  letter-spacing: 0;
+  line-height: 1.15;
 }
 html[lang='he'] .story-content {
   text-align: right;
@@ -215,9 +202,9 @@ html[lang='he'] .story-content {
 .story-content h1,
 .story-content h2,
 .story-content h3 {
-  font-family: var(--font-heading-en), sans-serif;
+  font-family: var(--font-body), serif;
   margin: 1.5rem 0 0.75rem;
-  font-weight: 700;
+  font-weight: 900;
 }
 .story-content ul,
 .story-content ol {
@@ -257,57 +244,99 @@ html[lang='he'] .story-content {
   font-family: var(--font-body), serif;
 }
 
-/* === SUIT FABRIC TEXTURE (user photo: public/textures/fabric.jpg) === */
+/* === PREMIUM DARK DESIGN SYSTEM === */
+/* Navbar + footer — deep charcoal, no texture */
 .fabric-bg {
-  background-color: #111118;
-  background-image: url('/textures/fabric-dark.jpg');
-  background-size: cover;
-  background-position: center;
+  background-color: #0f0f14;
+  color: #e8d5be;
 }
-
 .fabric-navbar {
-  background-color: #0a0a10;
-  background-image: url('/textures/fabric-dark.jpg');
-  background-size: cover;
-  background-position: center;
+  background-color: #0f0f14;
+  color: #f0e6d3;
 }
-
 .fabric-bg-light {
   background-color: #fdf8f0;
 }
 
+/* Divider between dark and light sections */
 .fabric-divider {
-  height: 4px;
-  background: linear-gradient(90deg, #111118 0%, #2a2a35 30%, #c9a84c 50%, #2a2a35 70%, #111118 100%);
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, #c9a84c 30%, #7a1f3d 50%, #c9a84c 70%, transparent 100%);
 }
 
-/* Hero photo + burgundy → dark gradient overlay (on top of the fabric/photo) */
+/* Hero — Jerusalem photo (next/image) under a rich burgundy→dark overlay */
 .hero-section {
   position: relative;
   isolation: isolate;
-  background-color: #1a1a1f;
-  background-image: url('/textures/fabric-gray.jpg');
-  background-size: cover;
-  background-position: center;
+  color: rgba(245, 230, 211, 0.75);
 }
 .hero-section::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(160deg, rgba(80, 15, 35, 0.62) 0%, rgba(15, 10, 22, 0.74) 100%);
+  background: linear-gradient(170deg, rgba(60, 10, 25, 0.88) 0%, rgba(10, 8, 18, 0.92) 60%, rgba(10, 8, 18, 0.96) 100%);
 }
 
-/* Text on dark fabric (hero / navbar / footer) — keep everything legible */
-.hero-section,
-.fabric-bg,
-.fabric-navbar {
-  color: #e8d5be;
+/* Content (light) headings — dark brown. Listed BEFORE the hero rule so heroes win. */
+.fabric-bg-light h1,
+.fabric-bg-light h2,
+.fabric-bg-light h3,
+.fabric-bg-light h4 {
+  color: #2d1a0e;
 }
-.hero-section h1, .hero-section h2, .hero-section h3,
-.fabric-bg h1, .fabric-bg h2, .fabric-bg h3 {
+
+/* Hero headings + main title */
+.hero-section h1, .hero-section h2, .hero-section h3 {
   color: #f5e6d3;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8);
+}
+.hero-section h1 {
+  font-family: var(--font-body), serif;
+  font-weight: 900;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  letter-spacing: -0.01em;
+}
+
+/* Hero gold subtitle + small tagline */
+.hero-subtitle {
+  color: #c9a84c;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+}
+.hero-tagline {
+  color: rgba(245, 230, 211, 0.75);
+  font-size: 0.95rem;
+}
+
+/* Gold solid CTA button */
+.btn-cta {
+  display: inline-block;
+  background: #c9a84c;
+  color: #0f0f14;
+  font-weight: 700;
+  padding: 14px 36px;
+  border-radius: 32px;
+  border: none;
+  font-size: 1rem;
+  box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3);
+  transition: all 0.2s;
+}
+.btn-cta:hover {
+  background: #e8c96a;
+  box-shadow: 0 6px 28px rgba(201, 168, 76, 0.45);
+  transform: translateY(-1px);
+}
+
+/* Gold accent line under section titles */
+.section-accent {
+  display: block;
+  width: 60px;
+  height: 2px;
+  background: #c9a84c;
+  margin: 12px auto 24px;
 }
 
 /* ── Animations ── */

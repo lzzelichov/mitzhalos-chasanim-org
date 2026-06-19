@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { setRequestLocale } from 'next-intl/server';
 import { getSiteContent, contentRaw, contentText, settingOn } from '@/lib/siteContent';
@@ -6,6 +7,8 @@ import { localeDate } from '@/lib/hebcal';
 import StatCounter from '@/components/StatCounter';
 
 export const dynamic = 'force-dynamic';
+
+const HERO = 'https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=1920&q=85';
 
 export default async function HomePage({ params: { locale } }: { params: { locale: string } }) {
   setRequestLocale(locale);
@@ -32,16 +35,17 @@ export default async function HomePage({ params: { locale } }: { params: { local
         </div>
       )}
 
-      <section className="hero-section flex min-h-[70vh] items-center justify-center overflow-hidden text-center text-white">
+      <section className="hero-section flex min-h-[70vh] items-center justify-center overflow-hidden text-center">
+        <Image src={HERO} alt="" fill priority sizes="100vw" className="object-cover" />
         <div className="relative z-10 mx-auto max-w-3xl px-4 py-20">
-          <h1 className="font-display text-4xl font-bold drop-shadow sm:text-6xl">
+          <h1 className="font-display">
             {r('brand.name', locale === 'he' ? 'מצהלות חתנים' : 'Mitzhalos Chasanim')}
           </h1>
-          <p className="mt-4 font-serif text-2xl text-gold-soft sm:text-3xl">
+          <p className="hero-subtitle mt-4 font-serif">
             {r('home.tagline', locale === 'he' ? 'לבוש חתן הוא מצווה' : 'Clothing a Groom is a Mitzvah')}
           </p>
-          {t('home.hero_sub') && <p className="mx-auto mt-3 max-w-xl font-sans text-white/80">{t('home.hero_sub')}</p>}
-          <Link href="/sponsor" className="btn-gold mt-8 !px-8 !py-3 text-base">
+          {t('home.hero_sub') && <p className="hero-tagline mx-auto mt-3 max-w-xl">{t('home.hero_sub')}</p>}
+          <Link href="/sponsor" className="btn-cta mt-8">
             {r('home.cta', 'Sponsor a Couple')}
           </Link>
         </div>
@@ -55,8 +59,8 @@ export default async function HomePage({ params: { locale } }: { params: { local
             <StatCounter end={stats.totalRaised} prefix="$" label={r('home.stat_raised', 'raised total')} />
           ) : (
             <div className="card text-center">
-              <p className="font-display text-4xl font-bold text-burgundy">—</p>
-              <p className="font-sans text-sm text-charcoal/60">{r('home.stat_raised', 'raised total')}</p>
+              <p className="font-display text-[2.5rem] font-black leading-none text-burgundy">—</p>
+              <p className="mt-2 font-sans text-[0.85rem] text-[#888]">{r('home.stat_raised', 'raised total')}</p>
             </div>
           )}
         </section>
@@ -75,7 +79,8 @@ export default async function HomePage({ params: { locale } }: { params: { local
         {news.length > 0 && (
           <section className="mt-16">
             <div className="fabric-divider mb-12" />
-            <h2 className="mb-6 text-center font-display text-3xl font-bold text-burgundy">{r('home.news_title', 'Latest News')}</h2>
+            <h2 className="text-center font-display text-3xl font-bold">{r('home.news_title', 'Latest News')}</h2>
+            <span className="section-accent" />
             <div className="grid gap-5 md:grid-cols-3">
               {news.map((p) => (
                 <Link key={p.id} href={`/news/${p.slug}`} className="card block transition-shadow hover:shadow-glow">

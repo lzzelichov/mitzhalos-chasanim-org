@@ -13,7 +13,7 @@ Payments run through Stripe (USD only).
 - **next-intl** for EN/HE with full RTL
 - **Supabase** (Postgres + Storage)
 - **Stripe** Checkout + webhook (USD only)
-- **Tailwind CSS**, `next/font` — Frank Ruhl Libre (body both langs + Hebrew/Yiddish headings, weight 900), Playfair Display (English headings, weight 900)
+- **Tailwind CSS**, `next/font` — Frank Ruhl Libre (body weight 400 + all headings weight 900, both languages)
 - Hebrew dates via `@hebcal/hdate`
 
 ## Pages

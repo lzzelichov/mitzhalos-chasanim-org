@@ -1,10 +1,13 @@
 import { Suspense } from 'react';
+import Image from 'next/image';
 import { setRequestLocale } from 'next-intl/server';
 import { getSiteContent, contentRaw } from '@/lib/siteContent';
 import { getSiteUrl } from '@/lib/utils';
 import ThankYouClient from '@/components/ThankYouClient';
 
 export const dynamic = 'force-dynamic';
+
+const THANKYOU_IMG = 'https://images.unsplash.com/photo-1548407260-da850faa41e3?w=1920&q=85';
 
 export default async function ThankYouPage({ params: { locale } }: { params: { locale: string } }) {
   setRequestLocale(locale);
@@ -13,6 +16,7 @@ export default async function ThankYouPage({ params: { locale } }: { params: { l
 
   return (
     <section className="hero-section flex min-h-[80vh] items-center justify-center overflow-hidden text-white">
+      <Image src={THANKYOU_IMG} alt="" fill priority sizes="100vw" className="object-cover" />
       <div className="relative z-10 w-full">
         <Suspense>
           <ThankYouClient
