@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
-import { hasAdminUiCookie } from '@/lib/adminClient';
 import { cn } from '@/lib/utils';
 
 interface NavLabels {
@@ -25,11 +24,6 @@ export default function Navbar({
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [admin, setAdmin] = useState(false);
-
-  useEffect(() => {
-    setAdmin(hasAdminUiCookie());
-  }, []);
 
   const links = [
     { href: '/', label: nav.home },
@@ -60,11 +54,6 @@ export default function Navbar({
               {l.label}
             </Link>
           ))}
-          {admin && (
-            <Link href="/admin" className="rounded-full px-3 py-1.5 font-sans text-sm text-cream/40 hover:text-gold">
-              Admin
-            </Link>
-          )}
           <button
             onClick={() => router.replace(pathname, { locale: other })}
             className="ml-1 rounded-full border border-cream/30 px-3 py-1.5 font-sans text-sm font-semibold text-cream hover:bg-gold hover:text-charcoal"
@@ -98,11 +87,6 @@ export default function Navbar({
               {l.label}
             </Link>
           ))}
-          {admin && (
-            <Link href="/admin" onClick={() => setOpen(false)} className="block rounded-lg px-3 py-2 font-sans text-sm text-cream/50">
-              Admin
-            </Link>
-          )}
           <button
             onClick={() => {
               setOpen(false);

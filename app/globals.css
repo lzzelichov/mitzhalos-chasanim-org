@@ -264,18 +264,19 @@ html[lang='he'] .story-content {
   background: linear-gradient(90deg, transparent 0%, #c9a84c 30%, #7a1f3d 50%, #c9a84c 70%, transparent 100%);
 }
 
-/* Hero — Jerusalem photo (next/image) under a rich burgundy→dark overlay */
+/* Hero — Jerusalem photo (next/image, Vercel-proxied) under a tinted overlay.
+   Overlay kept moderate so the photo is clearly visible while text stays legible. */
 .hero-section {
   position: relative;
   isolation: isolate;
-  color: rgba(245, 230, 211, 0.75);
+  color: rgba(245, 230, 211, 0.78);
 }
 .hero-section::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(170deg, rgba(60, 10, 25, 0.88) 0%, rgba(10, 8, 18, 0.92) 60%, rgba(10, 8, 18, 0.96) 100%);
+  background: linear-gradient(170deg, rgba(60, 10, 25, 0.6) 0%, rgba(10, 8, 18, 0.72) 100%);
 }
 
 /* Content (light) headings — dark brown. Listed BEFORE the hero rule so heroes win. */

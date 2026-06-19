@@ -60,8 +60,8 @@ export default function SponsorClient({
         {selected && !loading && couples !== null && (
           couples.length > 0 ? (
             <div className="fade-in-up">
-              <h2 className="mb-1 text-center font-display text-3xl font-bold text-burgundy">{labels.resultsTitle}</h2>
-              <p className="mb-5 text-center font-serif text-burgundy/70">{localeDate(selected, locale)}</p>
+              <h2 className="mb-1 text-center font-display text-3xl font-bold" style={{ color: '#f5e6d3' }}>{labels.resultsTitle}</h2>
+              <p className="mb-5 text-center font-serif" style={{ color: 'rgba(245,230,211,0.7)' }}>{localeDate(selected, locale)}</p>
               <div className="grid gap-5 md:grid-cols-2">
                 {couples.map((c, i) => (
                   <div key={c.id} className="fade-in-up" style={{ animationDelay: `${i * 70}ms` }}>
