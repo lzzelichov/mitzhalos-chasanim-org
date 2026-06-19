@@ -20,12 +20,12 @@ const config: Config = {
         blush: '#f5e6d3',
       },
       fontFamily: {
-        // Headings — luxury wedding-invitation serif
-        display: ['var(--font-cormorant)', 'Georgia', 'serif'],
-        // Subheadings
-        serif: ['var(--font-playfair)', 'Georgia', 'serif'],
-        // Body
-        sans: ['var(--font-lato)', 'system-ui', 'sans-serif'],
+        // Headings — Raleway (en); Suez One on [lang=he] via globals.css
+        display: ['var(--font-heading-en)', 'sans-serif'],
+        // Subheads / taglines render as body per the type system
+        serif: ['var(--font-body)', 'serif'],
+        // Body — Frank Ruhl Libre (both languages)
+        sans: ['var(--font-body)', 'serif'],
       },
       boxShadow: {
         glow: '0 0 24px rgba(201, 168, 76, 0.35)',

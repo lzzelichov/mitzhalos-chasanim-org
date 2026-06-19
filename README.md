@@ -13,7 +13,7 @@ Payments run through Stripe (USD only).
 - **next-intl** for EN/HE with full RTL
 - **Supabase** (Postgres + Storage)
 - **Stripe** Checkout + webhook (USD only)
-- **Tailwind CSS**, `next/font` (Cormorant Garamond + Playfair + Lato + Noto Serif Hebrew)
+- **Tailwind CSS**, `next/font` — Frank Ruhl Libre (body, both languages), Raleway (English headings), Suez One (Hebrew headings)
 - Hebrew dates via `@hebcal/hdate`
 
 ## Pages

@@ -24,6 +24,11 @@ body {
     var(--ivory);
   background-attachment: fixed;
   min-height: 100vh;
+  /* Body — Frank Ruhl Libre (both languages) */
+  font-family: var(--font-body), serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.7;
 }
 
 /* RTL helper */
@@ -31,16 +36,28 @@ body {
   transform: scaleX(-1);
 }
 
-/* Hebrew typography */
-html[lang='he'] body {
-  font-family: var(--font-noto-he), var(--font-lato), system-ui, sans-serif;
+/* Headings — Raleway (English) */
+h1, h2, h3, h4, h5, h6,
+.font-display {
+  font-family: var(--font-heading-en), sans-serif;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
 }
-html[lang='he'] h1,
-html[lang='he'] h2,
-html[lang='he'] h3,
-html[lang='he'] .font-display,
-html[lang='he'] .font-serif {
-  font-family: var(--font-noto-he), Georgia, serif;
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+}
+
+/* Headings — Suez One (Hebrew, single weight 400) */
+[lang='he'] h1,
+[lang='he'] h2,
+[lang='he'] h3,
+[lang='he'] h4,
+[lang='he'] h5,
+[lang='he'] h6,
+[lang='he'] .font-display {
+  font-family: var(--font-heading-he), serif;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 html[lang='he'] .story-content {
   text-align: right;
@@ -203,7 +220,7 @@ html[lang='he'] .story-content {
 .story-content h1,
 .story-content h2,
 .story-content h3 {
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-heading-en), sans-serif;
   margin: 1.5rem 0 0.75rem;
   font-weight: 700;
 }
@@ -242,7 +259,7 @@ html[lang='he'] .story-content {
   border-radius: 0 0 0.5rem 0.5rem;
   background: #fff;
   min-height: 140px;
-  font-family: var(--font-lato), system-ui, sans-serif;
+  font-family: var(--font-body), serif;
 }
 
 /* ── Fabric texture (subtle, tailored feel) ── */
