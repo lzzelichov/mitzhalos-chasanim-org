@@ -270,13 +270,8 @@ html[lang='he'] .story-content {
   position: relative;
   isolation: isolate;
   color: rgba(245, 230, 211, 0.78);
-}
-.hero-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(170deg, rgba(60, 10, 25, 0.82) 0%, rgba(10, 8, 18, 0.92) 100%);
+  /* No photos — clean dark burgundy → near-black gradient. */
+  background: linear-gradient(170deg, #3c0a19 0%, #0a0812 100%);
 }
 
 /* Content (light) headings — dark brown. Listed BEFORE the hero rule so heroes win. */

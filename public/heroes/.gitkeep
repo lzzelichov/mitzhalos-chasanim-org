@@ -1,0 +1,8 @@
+# Drop the four hero photos here, named EXACTLY:
+#   home.jpg      — Kotel / Jerusalem (home hero)
+#   about.jpg     — Jerusalem stone streets (about hero)
+#   contact.jpg   — olive trees / landscape (contact hero)
+#   thankyou.jpg  — Jerusalem sunrise (thank-you hero)
+#
+# No people / no women (site policy). Once these exist, the hero pages will be
+# switched to /heroes/<name>.jpg (served same-origin — correct + filter-proof).

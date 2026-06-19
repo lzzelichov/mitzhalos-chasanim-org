@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { setRequestLocale } from 'next-intl/server';
 import { getSiteContent, contentRaw, contentText } from '@/lib/siteContent';
@@ -6,8 +5,6 @@ import { getOrgPhotos } from '@/lib/data';
 import PhotoGallery from '@/components/PhotoGallery';
 
 export const dynamic = 'force-dynamic';
-
-const ABOUT_IMG = 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=1920&q=85';
 
 export default async function AboutPage({ params: { locale } }: { params: { locale: string } }) {
   setRequestLocale(locale);
@@ -26,7 +23,6 @@ export default async function AboutPage({ params: { locale } }: { params: { loca
   return (
     <div>
       <section className="hero-section flex min-h-[40vh] items-center justify-center overflow-hidden text-center">
-        <Image src={ABOUT_IMG} alt="" fill priority sizes="100vw" className="object-cover" />
         <h1 className="relative z-10 font-display">{r('about.title', 'About Us')}</h1>
       </section>
 
