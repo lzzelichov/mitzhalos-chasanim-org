@@ -32,27 +32,23 @@ body {
   transform: scaleX(-1);
 }
 
-/* Headings — Raleway (English) */
+/* Headings — Playfair Display 900 (English) */
 h1, h2, h3, h4, h5, h6,
 .font-display {
-  font-family: var(--font-heading-en), sans-serif;
-  line-height: 1.2;
-  letter-spacing: 0.02em;
-}
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 700;
+  font-family: var(--font-heading-en), serif;
+  font-weight: 900;
+  line-height: 1.15;
 }
 
-/* Headings — Suez One (Hebrew, single weight 400) */
-[lang='he'] h1,
-[lang='he'] h2,
-[lang='he'] h3,
-[lang='he'] h4,
-[lang='he'] h5,
-[lang='he'] h6,
-[lang='he'] .font-display {
-  font-family: var(--font-heading-he), serif;
-  font-weight: 400;
+/* Headings — Frank Ruhl Libre 900 (Hebrew / Yiddish) */
+[lang='he'] h1, [lang='he'] h2, [lang='he'] h3,
+[lang='he'] h4, [lang='he'] h5, [lang='he'] h6,
+[lang='he'] .font-display,
+[lang='yi'] h1, [lang='yi'] h2, [lang='yi'] h3,
+[lang='yi'] h4, [lang='yi'] h5, [lang='yi'] h6,
+[lang='yi'] .font-display {
+  font-family: var(--font-body), serif;
+  font-weight: 900;
   letter-spacing: 0;
 }
 html[lang='he'] .story-content {

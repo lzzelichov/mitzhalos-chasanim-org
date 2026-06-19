@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Frank_Ruhl_Libre, Raleway, Suez_One } from 'next/font/google';
+import { Frank_Ruhl_Libre, Playfair_Display } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
@@ -13,20 +13,15 @@ import '../globals.css';
 
 const frankRuhl = Frank_Ruhl_Libre({
   subsets: ['latin', 'hebrew'],
-  weight: ['300', '400', '500', '700', '900'],
+  weight: ['400', '700', '900'],
   variable: '--font-body',
   display: 'swap',
 });
-const raleway = Raleway({
+const playfair = Playfair_Display({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '800'],
+  weight: ['400', '700', '900'],
+  style: ['normal', 'italic'],
   variable: '--font-heading-en',
-  display: 'swap',
-});
-const suezOne = Suez_One({
-  subsets: ['latin', 'hebrew'],
-  weight: ['400'],
-  variable: '--font-heading-he',
   display: 'swap',
 });
 
@@ -78,7 +73,7 @@ export default async function LocaleLayout({
   const mobileCta = contentRaw(content, 'mobile.cta', locale, locale === 'he' ? 'תמכו בחתן' : 'Sponsor a Chassan');
 
   return (
-    <html lang={locale} dir={dir} className={`${frankRuhl.variable} ${raleway.variable} ${suezOne.variable}`}>
+    <html lang={locale} dir={dir} className={`${frankRuhl.variable} ${playfair.variable}`}>
       <body className="font-sans antialiased fabric-bg-light">
         <NextIntlClientProvider messages={messages}>
           <SiteContentProvider settings={settings}>

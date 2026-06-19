@@ -20,8 +20,8 @@ const config: Config = {
         blush: '#f5e6d3',
       },
       fontFamily: {
-        // Headings — Raleway (en); Suez One on [lang=he] via globals.css
-        display: ['var(--font-heading-en)', 'sans-serif'],
+        // Headings — Playfair Display (en); Frank Ruhl Libre on [lang=he/yi] via globals.css
+        display: ['var(--font-heading-en)', 'serif'],
         // Subheads / taglines render as body per the type system
         serif: ['var(--font-body)', 'serif'],
         // Body — Frank Ruhl Libre (both languages)
