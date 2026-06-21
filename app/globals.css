@@ -278,8 +278,14 @@ html[lang='he'] .story-content {
   position: absolute;
   inset: 0;
   z-index: 1;
-  /* Moderate tint so the photo shows clearly while cream text stays readable. */
-  background: linear-gradient(170deg, rgba(60, 10, 25, 0.5) 0%, rgba(10, 8, 18, 0.68) 100%);
+  /* Heavier tint to mask pixelation on low-res photos. */
+  background: linear-gradient(170deg, rgba(60, 10, 25, 0.88) 0%, rgba(10, 8, 18, 0.94) 100%);
+}
+/* Soften low-resolution hero photos when stretched full-width. */
+.hero-section img {
+  filter: blur(0.5px);
+  transform: scale(1.05);
+  image-rendering: smooth;
 }
 
 /* Content (light) headings — dark brown. Listed BEFORE the hero rule so heroes win. */

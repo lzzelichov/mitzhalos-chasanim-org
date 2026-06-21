@@ -4,10 +4,32 @@
 import { HDate } from '@hebcal/hdate';
 import { getHolidaysOnDate } from '@hebcal/core/dist/esm/holidays';
 import { flags } from '@hebcal/core/dist/esm/event';
+import { getSedra } from '@hebcal/core/dist/esm/sedra';
+import { renderParshaName } from '@hebcal/core/dist/esm/parshaName';
 import { toISODate, formatDateLabel } from './utils';
 
-// Israel holiday schedule (the site is Jerusalem-focused).
-const IL = true;
+// Diaspora schedule: separate Shmini Atzeres/Simchas Torah + diaspora parsha.
+const IL = false;
+
+/** Only these religious holidays are shown — Israeli civic/state days excluded. */
+const RELIGIOUS_HOLIDAYS_ONLY = [
+  'Rosh Hashana',
+  'Yom Kippur',
+  'Sukkot',
+  'Shmini Atzeret',
+  'Simchat Torah',
+  'Chanukah',
+  'Tu BiShvat',
+  'Purim',
+  'Pesach',
+  'Lag BaOmer',
+  'Shavuot',
+  "Tish'a B'Av",
+  'Rosh Chodesh',
+];
+function isReligiousHoliday(desc: string): boolean {
+  return RELIGIOUS_HOLIDAYS_ONLY.some((h) => desc.includes(h));
+}
 
 /** Remove Hebrew niqqud / cantillation marks for cleaner display. */
 export function stripNikud(s: string): string {
@@ -60,15 +82,30 @@ export interface DayHoliday {
 
 export function dayHolidays(date: Date): DayHoliday[] {
   const evs = getHolidaysOnDate(new HDate(date), IL) ?? [];
-  return evs.map((ev) => ({
-    he: stripNikud(ev.render('he')),
-    en: ev.render('en'),
-    isYomTov: (ev.getFlags() & flags.CHAG) !== 0,
-  }));
+  return evs
+    .filter((ev) => isReligiousHoliday(ev.getDesc()))
+    .map((ev) => ({
+      he: stripNikud(ev.render('he')),
+      en: ev.render('en'),
+      isYomTov: (ev.getFlags() & flags.CHAG) !== 0,
+    }));
 }
 
 export function isShabbat(date: Date): boolean {
   return date.getDay() === 6;
+}
+
+/** Hebrew parsha name for a Shabbat date; null on weekdays or holiday readings. */
+export function parshaHe(date: Date): string | null {
+  if (date.getDay() !== 6) return null;
+  try {
+    const hd = new HDate(date);
+    const res = getSedra(hd.getFullYear(), IL).lookup(hd);
+    if (res.chag) return null;
+    return stripNikud(renderParshaName(res.parsha, 'he'));
+  } catch {
+    return null;
+  }
 }
 
 export interface MonthDay {
@@ -79,6 +116,8 @@ export interface MonthDay {
   /** A holiday label to show (Yom Tov preferred), or null. */
   holiday: DayHoliday | null;
   isYomTov: boolean;
+  /** Hebrew parsha name on Shabbos, else null. */
+  parsha: string | null;
 }
 
 /** All days of a Gregorian month with their Hebrew/holiday metadata. */
@@ -95,6 +134,7 @@ export function buildMonth(year: number, monthIndex0: number): MonthDay[] {
       isShabbat: isShabbat(cur),
       holiday: label,
       isYomTov: hols.some((h) => h.isYomTov),
+      parsha: parshaHe(cur),
     });
     cur.setDate(cur.getDate() + 1);
   }
