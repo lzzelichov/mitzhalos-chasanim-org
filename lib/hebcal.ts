@@ -182,3 +182,70 @@ export function hebrewMonthLabel(year: number, monthIndex0: number): string {
 export function firstWeekday(year: number, monthIndex0: number): number {
   return new Date(year, monthIndex0, 1).getDay();
 }
+
+// ── Hebrew-date search parsing ───────────────────────────────────────────────
+const GEMATRIA: Record<string, number> = {
+  א: 1, ב: 2, ג: 3, ד: 4, ה: 5, ו: 6, ז: 7, ח: 8, ט: 9,
+  י: 10, כ: 20, ל: 30, מ: 40, נ: 50, ס: 60, ע: 70, פ: 80, צ: 90,
+  ק: 100, ר: 200, ש: 300, ת: 400, ך: 20, ם: 40, ן: 50, ף: 80, ץ: 90,
+};
+/** Sum Hebrew letters as gematriya ("כב"→22, "טו"→15); non-letters ignored. */
+export function gematriyaToNum(s: string): number {
+  let n = 0;
+  for (const ch of s) n += GEMATRIA[ch] ?? 0;
+  return n;
+}
+
+// Hebrew month name → hebcal month number (Nisan=1 … Adar I=12, Adar II=13).
+const HEB_MONTHS: Record<string, number> = {
+  ניסן: 1, אייר: 2, איר: 2, סיון: 3, סיוון: 3, תמוז: 4, אב: 5, אלול: 6,
+  תשרי: 7, חשון: 8, חשוון: 8, מרחשון: 8, מרחשוון: 8, כסלו: 9, כסליו: 9,
+  טבת: 10, שבט: 11, אדר: 12, אדרא: 12, אדרב: 13,
+};
+
+/** Parse a free-form Hebrew date ("כ״ב סיון", "כב סיון", "סיון כב", "22 סיון"). */
+export function parseHebrewDateInput(input: string): { day: number; month: number } | null {
+  if (!input) return null;
+  let cleaned = input.replace(/[׳״'"]/g, ''); // strip geresh/gershayim/quotes (they sit inside gematriya)
+  cleaned = cleaned.replace(/־/g, ' '); // maqaf → space
+  cleaned = stripNikud(cleaned).replace(/\s+/g, ' ').trim();
+  if (!cleaned) return null;
+
+  let day: number | null = null;
+  let month: number | null = null;
+  for (const tok of cleaned.split(' ')) {
+    if (month == null && HEB_MONTHS[tok] != null) { month = HEB_MONTHS[tok]; continue; }
+    if (day == null && /^\d+$/.test(tok)) { day = parseInt(tok, 10); continue; }
+    if (day == null) {
+      const g = gematriyaToNum(tok);
+      if (g > 0 && g <= 30) day = g;
+    }
+  }
+  // Multi-word month spellings ("מר חשון", "אדר א") — retry on the joined string.
+  if (month == null) month = HEB_MONTHS[cleaned.replace(/\s+/g, '')] ?? null;
+
+  if (day == null || month == null || day < 1 || day > 30) return null;
+  return { day, month };
+}
+
+/** Resolve a Hebrew day+month to a Gregorian ISO date — preferring a date already
+ *  on the calendar (e.g. a wedding), else the upcoming occurrence (this Hebrew
+ *  year, or next if it already passed). Returns null if the date is invalid. */
+export function hebrewDateToIso(day: number, month: number, preferIsos: string[] = []): string | null {
+  for (const iso of preferIsos) {
+    const d = new Date(iso + 'T00:00:00');
+    if (isNaN(d.getTime())) continue;
+    const hd = new HDate(d);
+    if (hd.getDate() === day && hd.getMonth() === month) return iso;
+  }
+  try {
+    const todayMid = new Date();
+    todayMid.setHours(0, 0, 0, 0);
+    const y0 = new HDate(todayMid).getFullYear();
+    let hd = new HDate(day, month, y0);
+    if (hd.greg() < todayMid) hd = new HDate(day, month, y0 + 1);
+    return toISODate(hd.greg());
+  } catch {
+    return null;
+  }
+}

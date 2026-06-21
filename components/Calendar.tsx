@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { buildMonth, firstWeekday, gregMonthLabel, hebrewMonthLabel } from '@/lib/hebcal';
 import { toISODate, cn } from '@/lib/utils';
 import type { DateCount } from '@/lib/data';
@@ -26,6 +26,16 @@ export default function Calendar({
   const [ym, setYm] = useState({ y: today.getFullYear(), m: today.getMonth() });
   const [shake, setShake] = useState<string | null>(null);
   const touchX = useRef<number | null>(null);
+
+  // Jump the visible month to the selected date (e.g. after a date search).
+  useEffect(() => {
+    if (!selected) return;
+    const d = new Date(selected + 'T00:00:00');
+    if (isNaN(d.getTime())) return;
+    setYm((prev) =>
+      prev.y === d.getFullYear() && prev.m === d.getMonth() ? prev : { y: d.getFullYear(), m: d.getMonth() }
+    );
+  }, [selected]);
 
   const days = useMemo(() => buildMonth(ym.y, ym.m), [ym]);
   const lead = useMemo(() => firstWeekday(ym.y, ym.m), [ym]);

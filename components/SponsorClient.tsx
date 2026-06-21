@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { localeDate } from '@/lib/hebcal';
+import { localeDate, parseHebrewDateInput, hebrewDateToIso } from '@/lib/hebcal';
 import { useSetting } from './SiteContentProvider';
 import Calendar from './Calendar';
 import CoupleCard from './CoupleCard';
@@ -26,6 +26,13 @@ export default function SponsorClient({
   const [modal, setModal] = useState<{ couple: Couple | null; type: 'full_package' | 'partial' } | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
+  const [hebText, setHebText] = useState('');
+  const [enDate, setEnDate] = useState('');
+  const [searchError, setSearchError] = useState(false);
+  const [searchActive, setSearchActive] = useState(false);
+  const hebTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const he = locale === 'he';
   const showProgress = useSetting('show_progress', true);
   const showAmounts = useSetting('show_amounts', true);
   const donationsOn = useSetting('enable_donations', true);
@@ -50,8 +57,110 @@ export default function SponsorClient({
     }
   }
 
+  // Jump to a found ISO date: select it (highlights + scrolls), calendar follows.
+  function runSearchIso(iso: string) {
+    setSearchError(false);
+    setSearchActive(true);
+    select(iso, (dateCounts[iso]?.count ?? 0) > 0);
+  }
+
+  function runHebrewSearch(text: string) {
+    if (!text.trim()) {
+      setSearchError(false);
+      return;
+    }
+    const parsed = parseHebrewDateInput(text);
+    const iso = parsed ? hebrewDateToIso(parsed.day, parsed.month, Object.keys(dateCounts)) : null;
+    if (!iso) {
+      setSearchActive(true);
+      setSearchError(true);
+      return;
+    }
+    runSearchIso(iso);
+  }
+
+  function onHebInput(v: string) {
+    setHebText(v);
+    if (hebTimer.current) clearTimeout(hebTimer.current);
+    hebTimer.current = setTimeout(() => runHebrewSearch(v), 300);
+  }
+
+  function onEnglishDate(v: string) {
+    setEnDate(v);
+    if (v) runSearchIso(v);
+  }
+
+  function clearSearch() {
+    if (hebTimer.current) clearTimeout(hebTimer.current);
+    setHebText('');
+    setEnDate('');
+    setSearchError(false);
+    setSearchActive(false);
+    setSelected(null);
+    setCouples(null);
+  }
+
   return (
     <div className="space-y-8">
+      {/* Date search — English picker + Hebrew text search */}
+      <div className="search-box mx-auto w-full max-w-[600px]">
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="order-2 flex-1 sm:order-1">
+            <label className="mb-1.5 block font-sans text-xs font-semibold text-charcoal/60">
+              📅 {he ? 'תאריך לועזי' : 'English date'}
+            </label>
+            <input
+              type="date"
+              value={enDate}
+              onChange={(e) => onEnglishDate(e.target.value)}
+              aria-label={he ? 'חיפוש לפי תאריך לועזי' : 'Search by English date'}
+              className="search-field"
+            />
+          </div>
+          <div className="order-1 flex-1 sm:order-2">
+            <label className="mb-1.5 block font-sans text-xs font-semibold text-charcoal/60">
+              🔤 {he ? 'תאריך עברי' : 'Hebrew date'}
+            </label>
+            <input
+              type="text"
+              dir="rtl"
+              value={hebText}
+              onChange={(e) => onHebInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') runHebrewSearch(hebText);
+              }}
+              placeholder="חפש תאריך עברי — כ״ב סיון"
+              className="search-field text-right"
+            />
+          </div>
+        </div>
+        <div className="mt-3 flex justify-center">
+          <button type="button" onClick={() => runHebrewSearch(hebText)} className="search-btn w-full sm:w-auto">
+            {he ? 'חפש' : 'Search'}
+          </button>
+        </div>
+        {searchError ? (
+          <p className="mt-3 text-center font-sans text-sm text-burgundy">
+            {he ? 'לא נמצאו חתנים בתאריך זה' : 'No couples found for this date'}{' '}
+            <button type="button" onClick={clearSearch} className="underline hover:text-gold">
+              {he ? 'נקה חיפוש' : 'Clear search'}
+            </button>
+          </p>
+        ) : (
+          searchActive && (
+            <p className="mt-2 text-center">
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="font-sans text-xs text-charcoal/50 underline hover:text-gold"
+              >
+                {he ? 'נקה חיפוש' : 'Clear search'}
+              </button>
+            </p>
+          )
+        )}
+      </div>
+
       <Calendar dateCounts={dateCounts} locale={locale} labels={labels} selected={selected} onSelect={select} />
 
       <div ref={resultsRef} className="scroll-mt-20">
