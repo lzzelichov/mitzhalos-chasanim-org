@@ -27,7 +27,12 @@ const RELIGIOUS_HOLIDAYS_ONLY = [
   "Tish'a B'Av",
   'Rosh Chodesh',
 ];
+// Substring matches that look like an approved holiday but are minor technical
+// observances we don't want cluttering the calendar (e.g. "Yom Kippur Katan",
+// "Purim Katan", "Rosh Hashana LaBehemot").
+const HOLIDAY_EXCLUDE = ['Katan', 'LaBehemot'];
 function isReligiousHoliday(desc: string): boolean {
+  if (HOLIDAY_EXCLUDE.some((x) => desc.includes(x))) return false;
   return RELIGIOUS_HOLIDAYS_ONLY.some((h) => desc.includes(h));
 }
 
@@ -95,14 +100,28 @@ export function isShabbat(date: Date): boolean {
   return date.getDay() === 6;
 }
 
-/** Hebrew parsha name for a Shabbat date; null on weekdays or holiday readings. */
+/** Ashkenaz/Yiddish-preferred spellings (plene where the masoretic text is defective). */
+const ASHKENAZ_SPELLING: Record<string, string> = {
+  בהעלתך: 'בהעלותך',
+};
+
+/** Hebrew parsha name for a Shabbat date; null on weekdays or holiday readings.
+ *  Returns just the name ("בהעלותך", "שלח לך", "חקת בלק") — the "פ׳" prefix is
+ *  added at the display layer. */
 export function parshaHe(date: Date): string | null {
   if (date.getDay() !== 6) return null;
   try {
     const hd = new HDate(date);
     const res = getSedra(hd.getFullYear(), IL).lookup(hd);
     if (res.chag) return null;
-    return stripNikud(renderParshaName(res.parsha, 'he'));
+    // Maqaf (־) separates compound names (שלח־לך, חקת־בלק) — turn it into a space
+    // BEFORE stripNikud, which would otherwise delete it along with the nikud.
+    let name = renderParshaName(res.parsha, 'he').replace(/־/g, ' ');
+    name = stripNikud(name) // remove nikud/te'amim first, so the prefix is bare letters
+      .replace(/^פרשת\s+/, '') // then drop the leading "פרשת"
+      .replace(/\s+/g, ' ')
+      .trim();
+    return ASHKENAZ_SPELLING[name] ?? name;
   } catch {
     return null;
   }

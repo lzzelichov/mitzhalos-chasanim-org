@@ -362,6 +362,14 @@ html[lang='he'] .story-content {
 }
 .num-pulse { display: inline-block; animation: numPulse 1.8s ease-in-out infinite; }
 
+/* Calendar tile shake — feedback when tapping a day with no chassanim. */
+@keyframes shakeX {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+.animate-shake { animation: shakeX 0.4s ease; }
+
 /* ── Floating mobile donate button ── */
 .mobile-cta {
   position: fixed;

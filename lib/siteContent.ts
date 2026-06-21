@@ -46,6 +46,13 @@ const TOGGLE = (key: string, label: string, on = true): SiteContentRow => ({
   is_visible: true,
 });
 
+/** A boolean toggle that lives in a content section (e.g. 'homepage') instead of
+ *  'settings', so it shows in /admin/content rather than /admin/settings. */
+const HOMEPAGE_TOGGLE = (key: string, label: string, on = true): SiteContentRow => ({
+  ...TOGGLE(key, label, on),
+  section: 'homepage',
+});
+
 const SETTING = (key: string, label: string, value: string, type: ContentType = 'text'): SiteContentRow => ({
   key,
   section: 'settings',
@@ -74,6 +81,11 @@ export const DEFAULT_CONTENT: SiteContentRow[] = [
   T('home.box3_body', 'homepage', 'Box 3 Body', 'Pick a meaningful date, see the couples marrying that day, and sponsor a full package or any amount.', 'בחרו תאריך משמעותי, ראו את החתנים המתחתנים באותו יום, ותרמו חבילה מלאה או כל סכום.', 'textarea'),
   T('home.news_title', 'homepage', 'Latest News Heading', 'Latest News', 'חדשות אחרונות'),
   T('home.live_counter', 'homepage', 'Live Counter (use {n} for the number)', 'This week: {n} chassanim need clothing support', 'השבוע: {n} חתנים זקוקים לתמיכה בלבוש'),
+  // Stat-card visibility toggles. type 'toggle' in the homepage section so they
+  // appear as checkboxes in /admin/content → Homepage AND feed settingOn().
+  HOMEPAGE_TOGGLE('show_chasanim_stat', 'Show stat card: couples helped (חתנים שנעזרו)'),
+  HOMEPAGE_TOGGLE('show_packages_stat', 'Show stat card: packages sponsored (חבילות שנתרמו)'),
+  HOMEPAGE_TOGGLE('show_raised_stat', 'Show stat card: raised total (נאסף עד כה)'),
 
   // ── About ──
   T('about.title', 'about', 'Page Title', 'About Us', 'אודותינו'),

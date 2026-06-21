@@ -24,6 +24,7 @@ export default function Calendar({
 }) {
   const today = useMemo(() => new Date(), []);
   const [ym, setYm] = useState({ y: today.getFullYear(), m: today.getMonth() });
+  const [shake, setShake] = useState<string | null>(null);
   const touchX = useRef<number | null>(null);
 
   const days = useMemo(() => buildMonth(ym.y, ym.m), [ym]);
@@ -31,13 +32,20 @@ export default function Calendar({
   const todayIso = toISODate(today);
   const he = locale === 'he';
   const dow = he ? DOW_HE : DOW_EN;
-  const monthLabel = he ? hebrewMonthLabel(ym.y, ym.m) : gregMonthLabel(ym.y, ym.m, locale);
+  const coupleWord = he ? 'חתנים' : 'couples';
 
   function shift(delta: number) {
     setYm(({ y, m }) => {
       const d = new Date(y, m + delta, 1);
       return { y: d.getFullYear(), m: d.getMonth() };
     });
+  }
+  function click(iso: string, has: boolean) {
+    if (!has) {
+      setShake(iso);
+      setTimeout(() => setShake((s) => (s === iso ? null : s)), 420);
+    }
+    onSelect(iso, has);
   }
   function onTouchStart(e: React.TouchEvent) {
     touchX.current = e.touches[0].clientX;
@@ -51,14 +59,30 @@ export default function Calendar({
 
   return (
     <div className="card" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-      <div className="mb-4 flex items-center justify-between">
-        <button onClick={() => shift(-1)} aria-label="Previous month" className="rounded-full px-4 py-1 text-3xl leading-none text-burgundy hover:bg-cream">
-          ‹
-        </button>
-        <h3 className="font-display text-2xl font-bold text-burgundy sm:text-3xl">{monthLabel}</h3>
-        <button onClick={() => shift(1)} aria-label="Next month" className="rounded-full px-4 py-1 text-3xl leading-none text-burgundy hover:bg-cream">
-          ›
-        </button>
+      {/* Month nav: Hebrew month+year (left) · arrows (center) · Gregorian (right) */}
+      <div className="mb-4 flex items-center justify-between gap-2" dir="ltr">
+        <p className="min-w-0 flex-1 truncate text-left font-display text-lg font-bold text-burgundy sm:text-2xl">
+          {hebrewMonthLabel(ym.y, ym.m)}
+        </p>
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            onClick={() => shift(-1)}
+            aria-label="Previous month"
+            className="rounded-full px-3 py-1 text-2xl leading-none text-burgundy transition-colors hover:bg-cream"
+          >
+            ‹
+          </button>
+          <button
+            onClick={() => shift(1)}
+            aria-label="Next month"
+            className="rounded-full px-3 py-1 text-2xl leading-none text-burgundy transition-colors hover:bg-cream"
+          >
+            ›
+          </button>
+        </div>
+        <p className="min-w-0 flex-1 truncate text-right font-sans text-xs text-charcoal/50 sm:text-sm">
+          {gregMonthLabel(ym.y, ym.m, locale)}
+        </p>
       </div>
 
       <div className="grid grid-cols-7 gap-1 sm:gap-2">
@@ -79,43 +103,101 @@ export default function Calendar({
           const isToday = day.iso === todayIso;
           const holiday = day.holiday ? (he ? day.holiday.he : day.holiday.en) : null;
 
-          const tile = isSel
-            ? 'border-burgundy bg-burgundy text-white shadow-lift'
+          // Background: selected > fully-sponsored > has-couples > Shabbos > normal.
+          const bg = isSel
+            ? 'bg-burgundy text-white'
             : has && fully
-              ? 'border-burgundy/40 bg-burgundy/5 text-charcoal hover:shadow-lift'
+              ? 'bg-[#f0f0f0] text-charcoal'
               : has
-                ? cn('border-gold/60 bg-gold/10 text-charcoal hover:shadow-lift', count >= 3 && 'shadow-glow')
-                : cn('border-burgundy/10 bg-white/60 text-charcoal/40', day.isShabbat && 'bg-gold-soft/20');
+                ? 'bg-[#fdf0e0] text-charcoal'
+                : day.isShabbat
+                  ? 'bg-[#fdfaf5] text-charcoal'
+                  : 'bg-white text-charcoal';
+
+          // Accent left border: today (burgundy) wins, else has-couples (gold).
+          const accent = isSel
+            ? 'border-burgundy'
+            : isToday
+              ? 'border-l-[3px] border-l-burgundy border-y-charcoal/10 border-r-charcoal/10'
+              : has && !fully
+                ? 'border-l-[3px] border-l-gold border-y-charcoal/10 border-r-charcoal/10'
+                : 'border-charcoal/10';
 
           return (
             <button
               key={day.iso}
               type="button"
-              onClick={() => onSelect(day.iso, has)}
-              className={cn('relative flex min-h-[58px] flex-col items-start rounded-xl border p-1.5 text-start transition-all sm:min-h-[84px] sm:p-2', tile)}
+              onClick={() => click(day.iso, has)}
+              className={cn(
+                'relative flex min-h-[60px] flex-col items-center justify-center rounded-xl border p-1 text-center transition-all duration-150 hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-lift sm:min-h-[88px] sm:p-2',
+                bg,
+                accent,
+                shake === day.iso && 'animate-shake'
+              )}
             >
+              {/* Gregorian number — small, top-start */}
               <span
                 className={cn(
-                  'font-display text-base font-bold leading-none sm:text-lg',
-                  isToday && !isSel && 'flex h-6 w-6 items-center justify-center rounded-full bg-burgundy text-white'
+                  'absolute start-1.5 top-1 font-sans text-[10px] font-medium leading-none',
+                  isSel ? 'text-white/70' : 'text-charcoal/40'
                 )}
               >
                 {day.gregDay}
               </span>
-              {day.isShabbat && (
-                <span className={cn('mt-0.5 text-[9px]', isSel ? 'text-white/80' : 'text-gold')}>{he ? 'שבת' : 'Shabbat'}</span>
-              )}
+
+              {/* Holiday dot — top-end */}
               {holiday && (
-                <span className={cn('mt-0.5 w-full truncate text-[9px] leading-tight', isSel ? 'text-white/80' : 'text-burgundy/70')}>{holiday}</span>
-              )}
-              {count > 0 && (
                 <span
                   className={cn(
-                    'absolute end-1 top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1 text-[10px] font-bold',
-                    isSel ? 'bg-white text-burgundy' : count >= 3 ? 'bg-burgundy text-gold' : 'bg-gold text-burgundy'
+                    'absolute end-1.5 top-1.5 h-1.5 w-1.5 rounded-full',
+                    isSel ? 'bg-white' : 'bg-burgundy'
+                  )}
+                />
+              )}
+
+              {/* Hebrew date (gematriya) — large, centered */}
+              <span className="mt-1 font-display text-sm font-bold leading-tight sm:text-lg">
+                {day.hebrew.short}
+              </span>
+
+              {/* Parsha on Shabbos — gold italic (desktop only) */}
+              {day.isShabbat && day.parsha && (
+                <span
+                  className={cn(
+                    'mt-0.5 hidden max-w-full truncate text-[10px] italic leading-tight sm:block',
+                    isSel ? 'text-white/90' : 'text-gold'
+                  )}
+                >
+                  פ׳ {day.parsha}
+                </span>
+              )}
+
+              {/* Holiday name — burgundy small (desktop only) */}
+              {holiday && (
+                <span
+                  className={cn(
+                    'mt-0.5 hidden max-w-full truncate text-[9px] leading-tight sm:block',
+                    isSel ? 'text-white/90' : 'text-burgundy'
+                  )}
+                >
+                  {holiday}
+                </span>
+              )}
+
+              {/* Couple count — gold pill (burgundy when fully sponsored) */}
+              {has && (
+                <span
+                  className={cn(
+                    'mt-1 inline-flex items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none',
+                    isSel
+                      ? 'bg-white text-burgundy'
+                      : fully
+                        ? 'bg-burgundy text-gold'
+                        : 'bg-gold text-burgundy'
                   )}
                 >
                   {count}
+                  <span className="hidden sm:inline">&nbsp;{coupleWord}</span>
                 </span>
               )}
             </button>
@@ -124,9 +206,18 @@ export default function Calendar({
       </div>
 
       <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1 font-sans text-xs text-charcoal/60">
-        <span><span className="me-1 inline-block h-3 w-3 rounded-full bg-gold align-middle" />{labels.legendGold}</span>
-        <span><span className="me-1 inline-block h-3 w-3 rounded-full bg-burgundy align-middle" />{labels.legendBurgundy}</span>
-        <span><span className="me-1 inline-block h-3 w-3 rounded-full bg-charcoal/20 align-middle" />{labels.legendGray}</span>
+        <span>
+          <span className="me-1 inline-block h-3 w-3 rounded-sm bg-gold align-middle" />
+          {labels.legendGold}
+        </span>
+        <span>
+          <span className="me-1 inline-block h-3 w-3 rounded-sm bg-burgundy align-middle" />
+          {labels.legendBurgundy}
+        </span>
+        <span>
+          <span className="me-1 inline-block h-3 w-3 rounded-sm bg-charcoal/20 align-middle" />
+          {labels.legendGray}
+        </span>
       </div>
     </div>
   );

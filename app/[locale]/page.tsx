@@ -4,6 +4,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { getSiteContent, contentRaw, contentText, settingOn } from '@/lib/siteContent';
 import { getOrgStats, getPublishedNews, getThisWeekCount } from '@/lib/data';
 import { localeDate } from '@/lib/hebcal';
+import { cn } from '@/lib/utils';
 import StatCounter from '@/components/StatCounter';
 
 export const dynamic = 'force-dynamic';
@@ -18,6 +19,12 @@ export default async function HomePage({ params: { locale } }: { params: { local
     showLive ? getThisWeekCount() : Promise.resolve(0),
   ]);
   const showAmounts = settingOn(c, 'show_amounts', true);
+  const showChasanim = settingOn(c, 'show_chasanim_stat', true);
+  const showPackages = settingOn(c, 'show_packages_stat', true);
+  const showRaised = settingOn(c, 'show_raised_stat', true);
+  const statCount = [showChasanim, showPackages, showRaised].filter(Boolean).length;
+  const statGrid =
+    statCount >= 3 ? 'sm:grid-cols-3' : statCount === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-1';
   const r = (k: string, f = '') => contentRaw(c, k, locale, f);
   const t = (k: string, f = '') => contentText(c, k, locale, f);
 
@@ -50,18 +57,21 @@ export default async function HomePage({ params: { locale } }: { params: { local
       </section>
 
       <div className="mx-auto max-w-6xl px-4">
-        <section className="relative z-10 -mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <StatCounter end={stats.couplesHelped} label={r('home.stat_couples', 'couples helped')} />
-          <StatCounter end={stats.packagesSponsored} label={r('home.stat_packages', 'packages sponsored')} />
-          {showAmounts ? (
-            <StatCounter end={stats.totalRaised} prefix="$" label={r('home.stat_raised', 'raised total')} />
-          ) : (
-            <div className="card text-center">
-              <p className="font-display text-[2.5rem] font-black leading-none text-burgundy">—</p>
-              <p className="mt-2 font-sans text-[0.85rem] text-[#888]">{r('home.stat_raised', 'raised total')}</p>
-            </div>
-          )}
-        </section>
+        {statCount > 0 && (
+          <section className={cn('relative z-10 -mt-10 grid grid-cols-1 gap-4', statGrid)}>
+            {showChasanim && <StatCounter end={stats.couplesHelped} label={r('home.stat_couples', 'couples helped')} />}
+            {showPackages && <StatCounter end={stats.packagesSponsored} label={r('home.stat_packages', 'packages sponsored')} />}
+            {showRaised &&
+              (showAmounts ? (
+                <StatCounter end={stats.totalRaised} prefix="$" label={r('home.stat_raised', 'raised total')} />
+              ) : (
+                <div className="card text-center">
+                  <p className="font-display text-[2.5rem] font-black leading-none text-burgundy">—</p>
+                  <p className="mt-2 font-sans text-[0.85rem] text-[#888]">{r('home.stat_raised', 'raised total')}</p>
+                </div>
+              ))}
+          </section>
+        )}
 
         <div className="fabric-divider mt-12" />
 
