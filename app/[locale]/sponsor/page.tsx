@@ -38,15 +38,30 @@ export default async function SponsorPage({ params: { locale } }: { params: { lo
     emailOpt: r('donate.email_opt', 'Email (optional)'),
   };
 
+  const orgName = r('brand.name', locale === 'he' ? 'מצהלות חתנים' : 'Mitzhalos Chasanim');
+
   return (
     <div style={{ backgroundColor: '#0f0f14' }}>
-      <div className="mx-auto max-w-5xl px-4 py-10">
-        <h1 className="text-center font-display text-4xl font-bold" style={{ color: '#f5e6d3' }}>{labels.title}</h1>
-        <span className="section-accent" />
-        <p className="mx-auto max-w-xl text-center font-sans" style={{ color: 'rgba(245,230,211,0.7)' }}>{labels.calSubtitle}</p>
-        <div className="mt-8">
-          <SponsorClient dateCounts={dateCounts} labels={labels} locale={locale} />
-        </div>
+      {/* Elegant dark header — no photo */}
+      <header className="px-4 pb-12 pt-20 text-center">
+        <h1 className="font-display text-5xl font-bold leading-tight sm:text-6xl" style={{ color: '#f5e6d3' }}>
+          {orgName}
+        </h1>
+        <p className="mt-4 font-display text-xl font-semibold sm:text-2xl" style={{ color: '#c9a84c' }}>
+          {labels.title}
+        </p>
+        <p className="mx-auto mt-3 max-w-xl font-sans" style={{ color: 'rgba(245,230,211,0.7)' }}>
+          {labels.calSubtitle}
+        </p>
+      </header>
+
+      {/* Thin gold divider between the dark header and the calendar */}
+      <div className="mx-auto max-w-5xl px-4">
+        <hr className="gold-divider" />
+      </div>
+
+      <div className="mx-auto max-w-5xl px-4 pb-12 pt-10">
+        <SponsorClient dateCounts={dateCounts} labels={labels} locale={locale} />
       </div>
     </div>
   );

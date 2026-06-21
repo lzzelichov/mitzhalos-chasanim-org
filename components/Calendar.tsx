@@ -58,7 +58,7 @@ export default function Calendar({
   }
 
   return (
-    <div className="card" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+    <div className="card border-gold/40 bg-[#fdf8f0]" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       {/* Month nav: Hebrew month+year (left) · arrows (center) · Gregorian (right) */}
       <div className="mb-4 flex items-center justify-between gap-2" dir="ltr">
         <p className="min-w-0 flex-1 truncate text-left font-display text-lg font-bold text-burgundy sm:text-2xl">
@@ -103,16 +103,18 @@ export default function Calendar({
           const isToday = day.iso === todayIso;
           const holiday = day.holiday ? (he ? day.holiday.he : day.holiday.en) : null;
 
-          // Background: selected > fully-sponsored > has-couples > Shabbos > normal.
+          // Background: selected > fully-sponsored > has-couples > today > Shabbos > normal.
           const bg = isSel
             ? 'bg-burgundy text-white'
             : has && fully
               ? 'bg-[#f0f0f0] text-charcoal'
               : has
                 ? 'bg-[#fdf0e0] text-charcoal'
-                : day.isShabbat
-                  ? 'bg-[#fdfaf5] text-charcoal'
-                  : 'bg-white text-charcoal';
+                : isToday
+                  ? 'bg-[#faf3e6] text-charcoal' // today: very subtle cream
+                  : day.isShabbat
+                    ? 'bg-[#fdfaf5] text-charcoal'
+                    : 'bg-white text-charcoal';
 
           // Accent left border: today (burgundy) wins, else has-couples (gold).
           const accent = isSel
